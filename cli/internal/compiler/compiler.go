@@ -3,20 +3,12 @@ package compiler
 import (
 	"bytes"
 	"fmt"
-	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
-	"github.com/bytesparadise/libasciidoc"
-	"github.com/bytesparadise/libasciidoc/pkg/configuration"
-	"github.com/sirupsen/logrus"
 )
-
-func init() {
-	// Suppress verbose logging from libasciidoc
-	logrus.SetLevel(logrus.WarnLevel)
-}
 
 // Compile compiles the full spec to Markdown
 func Compile(specPath string) (string, error) {
@@ -28,30 +20,29 @@ func Compile(specPath string) (string, error) {
 	return HTMLToMarkdown(html)
 }
 
-// CompileToHTML compiles the spec to HTML
+// CompileToHTML compiles the spec to HTML using asciidoctor CLI
 func CompileToHTML(specPath string) (string, error) {
-	input, err := os.Open(specPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to open spec: %v", err)
-	}
-	defer input.Close()
-
-	htmlBuf := &bytes.Buffer{}
-
-	// Set the base directory for include resolution
-	baseDir := filepath.Dir(specPath)
-	config := configuration.NewConfiguration(
-		configuration.WithBackEnd("html5"),
-		configuration.WithFilename(specPath),
-		configuration.WithAttribute("docdir", baseDir),
-	)
-
-	_, err = libasciidoc.Convert(input, htmlBuf, config)
-	if err != nil {
-		return "", fmt.Errorf("failed to compile spec: %v", err)
+	if !IsAsciidoctorAvailable() {
+		return "", fmt.Errorf("asciidoctor not found in PATH\n\nInstall with: gem install asciidoctor\nOr: brew install asciidoctor")
 	}
 
-	return htmlBuf.String(), nil
+	absPath, err := filepath.Abs(specPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve path: %v", err)
+	}
+
+	// asciidoctor -b html5 -o - file.adoc
+	cmd := exec.Command("asciidoctor", "-b", "html5", "-o", "-", absPath)
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("failed to compile spec: %v\n%s", err, stderr.String())
+	}
+
+	return stdout.String(), nil
 }
 
 // HTMLToMarkdown converts HTML to Markdown
@@ -68,19 +59,34 @@ func HTMLToMarkdown(html string) (string, error) {
 // CompileContent compiles AsciiDoc content string to Markdown
 // This is useful for compiling sections or fragments
 func CompileContent(content string, baseDir string) (string, error) {
-	htmlBuf := &bytes.Buffer{}
-
-	config := configuration.NewConfiguration(
-		configuration.WithBackEnd("html5"),
-		configuration.WithAttribute("docdir", baseDir),
-	)
-
-	// libasciidoc.Convert requires an io.Reader, so wrap the string
-	reader := strings.NewReader(content)
-	_, err := libasciidoc.Convert(reader, htmlBuf, config)
-	if err != nil {
-		return "", fmt.Errorf("failed to compile content: %v", err)
+	if !IsAsciidoctorAvailable() {
+		return "", fmt.Errorf("asciidoctor not found in PATH\n\nInstall with: gem install asciidoctor\nOr: brew install asciidoctor")
 	}
 
-	return HTMLToMarkdown(htmlBuf.String())
+	absBaseDir, err := filepath.Abs(baseDir)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve base dir: %v", err)
+	}
+
+	// asciidoctor -b html5 -B basedir -o - -
+	// -B sets base directory for includes
+	// - at end means read from stdin
+	cmd := exec.Command("asciidoctor", "-b", "html5", "-B", absBaseDir, "-o", "-", "-")
+	cmd.Stdin = strings.NewReader(content)
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("failed to compile content: %v\n%s", err, stderr.String())
+	}
+
+	return HTMLToMarkdown(stdout.String())
+}
+
+// IsAsciidoctorAvailable checks if asciidoctor CLI is installed
+func IsAsciidoctorAvailable() bool {
+	_, err := exec.LookPath("asciidoctor")
+	return err == nil
 }

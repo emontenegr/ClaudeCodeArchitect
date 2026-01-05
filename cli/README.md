@@ -9,12 +9,12 @@ Provides an interface for AI assistants (like Claude Code) to read, validate, an
 ## Installation
 
 ```bash
-# Build from source
+# If you have Go installed
+go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/spec-cli@latest
+
+# Or build from source
 cd cli
 go build -o spec-cli ./cmd/spec-cli
-
-# Or install to GOPATH/bin
-go install ./cmd/spec-cli
 ```
 
 ## Commands
@@ -107,7 +107,7 @@ spec: ./path/to/MANIFEST.adoc
 ## How It Works
 
 1. **Finds spec** via `.spec.yaml` or convention
-2. **Compiles AsciiDoc** to HTML (libasciidoc)
+2. **Compiles AsciiDoc** to HTML (asciidoctor)
 3. **Converts HTML** to Markdown (html-to-markdown)
 4. **Outputs** to stdout for AI consumption
 
@@ -132,8 +132,16 @@ Large specs (>20KB) prompt for confirmation. Use `--yes` to skip in CI.
 
 ## Requirements
 
-- Go 1.21+ (for building)
-- Claude CLI (for semantic validation)
+- **asciidoctor** (for AsciiDoc compilation)
+  ```bash
+  # Windows/Mac/Linux with Node.js
+  npm install -g @asciidoctor/cli
+
+  # Or with Ruby
+  gem install asciidoctor
+  ```
+- **Claude CLI** (for semantic validation) - https://claude.ai/code
+- Go 1.21+ (only if building from source)
 
 ## AI Workflow
 
