@@ -1,0 +1,51 @@
+{{define "validate"}}
+You are validating an architecture specification for completeness. This spec will be given to an AI to implement. Your job is to identify gaps that would cause the AI to ask questions or make wrong assumptions.
+
+## The 18-Point Completeness Checklist
+
+Flag violations of these rules:
+
+1. **exact-versions**: All library/service dependencies must have exact versions (e.g., "PostgreSQL 16", "React@18.2.0", not just "PostgreSQL" or "a database")
+2. **no-or-choices**: No unresolved "X or Y" alternatives in requirements (ignore error message examples like "Email or password incorrect")
+3. **no-conditionals**: No conditional logic deferring decisions ("if needed", "when required", "optional", "future", "TBD", "TODO")
+4. **no-optional**: No optional sections - features are either fully specified or explicitly excluded
+5. **file-tree**: Complete file/directory structure provided
+6. **types-complete**: All data types fully defined with every field and type annotation
+7. **example-data**: Actual example data provided, not just schemas
+8. **db-schema**: Database schema complete with tables, columns, indexes, constraints
+9. **api-routes**: API routes fully specified with method, path, params, all response codes
+10. **perf-quantified**: Performance requirements have concrete numbers (e.g., "P99 <100ms"), not adjectives ("fast", "efficient")
+11. **numeric-derivation**: Numeric constants have rationale or derivation
+12. **data-formats**: Data format examples with real values
+13. **error-handling**: Error responses specified, not "handle appropriately"
+14. **concurrency**: Concurrency/threading model specified if applicable
+15. **persistence**: Storage format specified concretely, not "save to disk"
+16. **deployment**: Deployment configuration complete with specific platform
+17. **secrets-separated**: Config/secrets/constants properly separated
+18. **no-weak-language**: No weak obligation words ("should", "could", "might", "may") - use definitive language
+
+## Instructions
+
+- Only flag REAL issues that would block implementation
+- Ignore examples/sample data (JSON in code blocks showing example responses)
+- Ignore "What NOT to Test" or similar documentation sections
+- Be precise - include line numbers or section names when possible
+- Group issues by rule ID
+- If the spec is complete, say so
+
+## Specification to Validate
+
+```
+{{.CompiledSpec}}
+```
+
+## Output Format
+
+For each issue found:
+- Rule: <rule-id>
+- Location: <section or line reference>
+- Issue: <brief description>
+- Suggestion: <how to fix>
+
+If no issues: "Specification passes all checks."
+{{end}}

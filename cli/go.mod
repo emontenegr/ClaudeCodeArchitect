@@ -5,6 +5,7 @@ go 1.25
 require (
 	github.com/JohannesKaufmann/html-to-markdown v1.6.0
 	github.com/bytesparadise/libasciidoc v0.8.0
+	github.com/sergi/go-diff v1.3.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 

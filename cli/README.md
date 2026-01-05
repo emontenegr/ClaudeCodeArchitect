@@ -1,50 +1,80 @@
 # spec-cli
 
-CLI tool for compiling architecture specifications for AI consumption.
+CLI tool for compiling and validating architecture specifications for AI consumption.
 
 ## Purpose
 
-Provides a simple interface for AI assistants (like Claude Code) to read architecture specifications written in AsciiDoc.
+Provides an interface for AI assistants (like Claude Code) to read, validate, and navigate architecture specifications written in AsciiDoc.
 
 ## Installation
 
 ```bash
-# From ClaudeCodeArchitect repo
-task build-cli
+# Build from source
+cd cli
+go build -o spec-cli ./cmd/spec-cli
 
-# Or install to system
-task install-cli
+# Or install to GOPATH/bin
+go install ./cmd/spec-cli
 ```
 
-## Usage
+## Commands
 
-### Compile Specification
+### compile
 
-Compiles AsciiDoc spec to Markdown and outputs to stdout:
+Compiles AsciiDoc spec to Markdown:
 
 ```bash
-spec-cli compile
+spec-cli compile                      # Full spec to stdout
+spec-cli compile --section "API Spec" # Single section with attrs resolved
+spec-cli compile --section core/types.adoc
 ```
 
-Claude Code workflow:
+### validate
+
+Validates spec completeness using structural checks + Claude semantic analysis:
+
 ```bash
-# Claude runs this to read your spec
-spec-cli compile
-# Markdown output appears in bash result, Claude reads it directly
+spec-cli validate           # Full validation (structural + Claude)
+spec-cli validate --quick   # Structural checks only (fast, no Claude)
+spec-cli validate --yes     # Skip size confirmation for large specs
 ```
 
-### Validate Specification
+Requires Claude CLI for semantic validation. Install from: https://claude.ai/code
 
-Checks if spec compiles without errors:
+### diff
+
+Compares compiled output between commits:
 
 ```bash
-spec-cli validate
+spec-cli diff           # Compare with HEAD~1
+spec-cli diff HEAD~3    # Compare with 3 commits ago
+spec-cli diff main      # Compare with main branch
 ```
 
-### Help
+### impact
+
+Shows which sections use an attribute:
 
 ```bash
-spec-cli help
+spec-cli impact api-p99-latency
+```
+
+Output:
+```
+Attribute: api-p99-latency
+Defined in: MANIFEST.adoc:4 = "100ms"
+
+Used in:
+  - MANIFEST.adoc:93 (Section: "Performance Requirements")
+  - MANIFEST.adoc:454 (Section: "Performance Specifications")
+```
+
+### list
+
+Lists all sections in the spec:
+
+```bash
+spec-cli list
 ```
 
 ## Configuration
@@ -61,15 +91,6 @@ myproject/
 └── src/
 ```
 
-Or in a subdirectory:
-
-```
-myproject/
-├── spec/
-│   └── MANIFEST.adoc
-└── src/
-```
-
 spec-cli automatically finds:
 - `MANIFEST.adoc`
 - `spec/MANIFEST.adoc`
@@ -83,52 +104,49 @@ Create `.spec.yaml` in your project root:
 spec: ./path/to/MANIFEST.adoc
 ```
 
-Paths can be:
-- Relative to project root
-- Absolute paths
-- Remote repos (future feature)
-
 ## How It Works
 
 1. **Finds spec** via `.spec.yaml` or convention
 2. **Compiles AsciiDoc** to HTML (libasciidoc)
 3. **Converts HTML** to Markdown (html-to-markdown)
-4. **Outputs Markdown** to stdout
-5. **AI reads** Markdown from bash output
+4. **Outputs** to stdout for AI consumption
 
-No intermediate files needed - Claude reads compilation output directly.
+Key feature: Attributes like `{api-p99-latency}` are resolved during compilation, so Claude sees actual values, not placeholders.
+
+## Validation
+
+The `validate` command runs two phases:
+
+**Phase 1: Structural Checks (Go)**
+- Spec compiles
+- Structure parseable
+- Has sections
+- Has key sections (types, API, deployment, etc.)
+
+**Phase 2: Semantic Validation (Claude)**
+- 18-point completeness checklist
+- Context-aware issue detection
+- No false positives on error message examples
+
+Large specs (>20KB) prompt for confirmation. Use `--yes` to skip in CI.
 
 ## Requirements
 
-- Go 1.25+ (for building)
-
-No external dependencies - pure Go implementation.
+- Go 1.21+ (for building)
+- Claude CLI (for semantic validation)
 
 ## AI Workflow
 
-When Claude Code needs to read your spec:
-
 ```bash
-# Claude runs:
-cd myproject
+# Claude reads your spec
 spec-cli compile
 
-# Gets Markdown output with:
-# - All includes resolved
-# - All attributes substituted
-# - Clean, readable Markdown
-# - No HTML noise
-```
+# Claude checks a specific section
+spec-cli compile --section "Database Schema"
 
-## Development
+# Claude checks attribute impact before changes
+spec-cli impact cache-ttl
 
-```bash
-# Build
-cd cli
-go build -o ../bin/spec-cli ./cmd/spec-cli
-
-# Test
-cd ../examples/simple-api
-../../bin/spec-cli validate
-../../bin/spec-cli compile > test.md
+# Validate before implementation
+spec-cli validate
 ```
