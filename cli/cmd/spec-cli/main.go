@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ClaudeCodeArchitect/spec-cli/internal/compiler"
-	"github.com/ClaudeCodeArchitect/spec-cli/internal/config"
-	"github.com/ClaudeCodeArchitect/spec-cli/internal/differ"
-	"github.com/ClaudeCodeArchitect/spec-cli/internal/impact"
-	"github.com/ClaudeCodeArchitect/spec-cli/internal/validator"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/compiler"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/config"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/differ"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/impact"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/validator"
 )
 
 func main() {

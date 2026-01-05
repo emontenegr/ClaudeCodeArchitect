@@ -1,4 +1,4 @@
-module github.com/ClaudeCodeArchitect/spec-cli
+module github.com/elijahmont3x/ClaudeCodeArchitect/cli
 
 go 1.25
 
@@ -6,6 +6,7 @@ require (
 	github.com/JohannesKaufmann/html-to-markdown v1.6.0
 	github.com/bytesparadise/libasciidoc v0.8.0
 	github.com/sergi/go-diff v1.3.1
+	github.com/sirupsen/logrus v1.7.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -20,7 +21,6 @@ require (
 	github.com/mna/pigeon v1.1.0 // indirect
 	github.com/onsi/ginkgo/v2 v2.1.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.7.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
