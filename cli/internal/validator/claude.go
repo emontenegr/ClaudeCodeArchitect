@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 	"text/template"
+	"time"
 )
 
 //go:embed prompts/*.tmpl
@@ -69,14 +70,45 @@ func RunClaudeValidation(compiledSpec string, output io.Writer) error {
 
 	// Run claude with prompt via stdin (avoids command line length limits)
 	// Using --print for non-interactive mode
+	fmt.Fprint(output, "Running Claude validation ")
+
 	cmd := exec.Command("claude", "--print")
 	cmd.Stdin = strings.NewReader(prompt)
-	cmd.Stdout = output
+
+	// Capture stdout to buffer while showing spinner
+	var resultBuf bytes.Buffer
+	cmd.Stdout = &resultBuf
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Run(); err != nil {
+	// Start spinner in goroutine
+	done := make(chan bool)
+	go func() {
+		spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+		i := 0
+		for {
+			select {
+			case <-done:
+				return
+			default:
+				fmt.Fprintf(output, "\rRunning Claude validation %s", spinner[i%len(spinner)])
+				i++
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
+	}()
+
+	err = cmd.Run()
+	done <- true
+
+	// Clear spinner line and show result
+	fmt.Fprint(output, "\r                                    \r")
+
+	if err != nil {
 		return fmt.Errorf("claude CLI failed: %w", err)
 	}
+
+	// Write the captured output
+	fmt.Fprint(output, resultBuf.String())
 
 	return nil
 }
