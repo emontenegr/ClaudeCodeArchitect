@@ -93,18 +93,48 @@ See it in practice:
 
 ## Quick Start
 
+### 1. Install Tools
+
 ```bash
-# 1. Create your project structure
-mkdir -p myproject/{core,concerns,interfaces,operations}
+# Install asciidoctor (required)
+npm install -g @asciidoctor/cli
 
-# 2. Write your spec following the principles
-vim myproject/MANIFEST.adoc
+# Install spec-cli
+go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/spec-cli@latest
+```
 
-# 3. Compile to single file for Claude
-asciidoctor -b markdown -o compiled-spec.md myproject/MANIFEST.adoc
+### 2. Install Claude Code Skill (Optional)
 
-# 4. Give to Claude Code
-claude-code "Read compiled-spec.md and implement the system"
+Copy the skill to your project for automatic spec-cli integration:
+
+```bash
+# From your project root
+mkdir -p .claude/skills
+cp -r path/to/ClaudeCodeArchitect/.claude/skills/spec-cli .claude/skills/
+```
+
+Or copy to your personal skills folder for all projects:
+```bash
+cp -r path/to/ClaudeCodeArchitect/.claude/skills/spec-cli ~/.claude/skills/
+```
+
+### 3. Create Your Spec
+
+```bash
+mkdir -p myproject/spec
+vim myproject/spec/MANIFEST.adoc
+```
+
+### 4. Validate and Implement
+
+```bash
+cd myproject
+
+# Validate spec completeness
+spec-cli validate
+
+# Give to Claude Code
+spec-cli compile  # Claude reads the output
 ```
 
 ## What Makes This Different
