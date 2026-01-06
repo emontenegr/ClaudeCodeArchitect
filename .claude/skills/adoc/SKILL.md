@@ -1,6 +1,6 @@
 ---
-name: spec-cli
-description: Work with architecture specifications written in AsciiDoc. Use when implementing features from a spec, validating spec completeness, checking attribute impact before changes, or navigating spec sections.
+name: adoc
+description: Handle AsciiDoc (.adoc) files. Use when you see .adoc files, MANIFEST.adoc, or spec/ folders. Never read .adoc files directly - use spec-cli to compile them first.
 ---
 
 # Architecture Specification Workflow
