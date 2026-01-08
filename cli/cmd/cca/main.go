@@ -265,8 +265,7 @@ func runSkill() error {
 			return nil
 		}
 
-		// Content differs - warn and update
-		fmt.Printf("Warning: Overwriting existing skill at %s\n", location)
+		// Content differs - update
 		if err := skill.Install(skillDir); err != nil {
 			return err
 		}
