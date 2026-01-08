@@ -242,34 +242,30 @@ func runSkill() error {
 
 	// Determine target directory
 	var skillDir string
-	var location string
+	var suffix string
 	if global {
 		var err error
 		skillDir, err = skill.GetGlobalSkillDir()
 		if err != nil {
 			return fmt.Errorf("failed to get home directory: %w", err)
 		}
-		location = "global (~/.claude/skills)"
+		suffix = " (global)"
 	} else {
 		skillDir = skill.GetProjectSkillDir()
-		location = "project (.claude/skills)"
+		suffix = ""
 	}
 
 	// Check if already installed
 	if skill.IsInstalled(skillDir) {
 		installed, _ := skill.GetInstalledContent(skillDir)
-		embedded := skill.GetEmbeddedContent()
-
-		if installed == embedded {
-			fmt.Printf("Skill already up to date at %s\n", location)
+		if installed == skill.GetEmbeddedContent() {
+			fmt.Printf("Skill up to date%s\n", suffix)
 			return nil
 		}
-
-		// Content differs - update
 		if err := skill.Install(skillDir); err != nil {
 			return err
 		}
-		fmt.Printf("Updated skill at %s\n", location)
+		fmt.Printf("Skill updated%s\n", suffix)
 		return nil
 	}
 
@@ -277,14 +273,13 @@ func runSkill() error {
 	if err := skill.Install(skillDir); err != nil {
 		return err
 	}
-	fmt.Printf("Installed skill at %s\n", location)
+	fmt.Printf("Skill installed%s\n", suffix)
 	return nil
 }
 
 // checkSkillUpdate prints a notice if skill update is available
 func checkSkillUpdate() {
-	skillDir := skill.GetProjectSkillDir()
-	if skill.NeedsUpdate(skillDir) {
-		fmt.Fprintf(os.Stderr, "Note: Skill update available. Run `cca skill` to update.\n\n")
+	if skill.NeedsUpdate(skill.GetProjectSkillDir()) {
+		fmt.Fprintf(os.Stderr, "Skill update available — run `cca skill`\n\n")
 	}
 }
