@@ -1,33 +1,32 @@
 version: '3'
 
 tasks:
-  build-cli:
+  build:
     desc: Build cca binary
-    dir: cli
     cmds:
-      - go build -o ../bin/cca{{if eq OS "windows"}}.exe{{end}} ./cmd/cca
+      - go build -o bin/cca{{if eq OS "windows"}}.exe{{end}} .
     sources:
-      - cli/**/*.go
-      - cli/go.mod
+      - "*.go"
+      - internal/**/*.go
+      - go.mod
     generates:
       - bin/cca{{if eq OS "windows"}}.exe{{end}}
 
-  install-cli:
+  install:
     desc: Install cca to GOPATH/bin
-    dir: cli
     cmds:
-      - go install ./cmd/cca
+      - go install .
 
-  test-cli:
+  test:
     desc: Test cca with simple-api example
     dir: examples/simple-api
     cmds:
-      - ../../bin/cca{{if eq OS "windows"}}.exe{{end}} validate --quick
-      - ../../bin/cca{{if eq OS "windows"}}.exe{{end}} list
-      - ../../bin/cca{{if eq OS "windows"}}.exe{{end}} impact api-p99-latency
+      - cca validate --quick
+      - cca list
+      - cca impact api-p99-latency
 
   clean:
     desc: Clean build artifacts
     cmds:
       - rm -f bin/cca{{if eq OS "windows"}}.exe{{end}}
-      - cd cli && go clean
+      - go clean

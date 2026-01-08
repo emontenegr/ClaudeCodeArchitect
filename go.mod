@@ -1,4 +1,4 @@
-module github.com/elijahmont3x/ClaudeCodeArchitect/cli
+module github.com/elijahmont3x/ClaudeCodeArchitect
 
 go 1.25
 

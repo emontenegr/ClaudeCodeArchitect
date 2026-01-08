@@ -100,7 +100,7 @@ See it in practice:
 npm install -g @asciidoctor/cli
 
 # Install cca
-go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/cca@v0.1.0
+go install github.com/elijahmont3x/ClaudeCodeArchitect@v0.1.0
 ```
 
 ### 2. Install Claude Code Skill

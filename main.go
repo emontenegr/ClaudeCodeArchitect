@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/compiler"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/config"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/differ"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/impact"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/skill"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/validator"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/compiler"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/config"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/differ"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/impact"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/skill"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/validator"
 )
 
 func main() {

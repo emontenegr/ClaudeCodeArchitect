@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/compiler"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/parser"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/compiler"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/parser"
 )
 
 // StructuralCheck represents a fast pre-flight check

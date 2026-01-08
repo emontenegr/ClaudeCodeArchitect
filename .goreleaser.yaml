@@ -4,12 +4,11 @@ project_name: cca
 
 before:
   hooks:
-    - go mod tidy -C cli
+    - go mod tidy
 
 builds:
   - id: cca
-    dir: cli
-    main: ./cmd/cca
+    main: .
     binary: cca
     env:
       - CGO_ENABLED=0
