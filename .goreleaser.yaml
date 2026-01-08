@@ -1,0 +1,50 @@
+version: 2
+
+project_name: spec-cli
+
+before:
+  hooks:
+    - go mod tidy -C cli
+
+builds:
+  - id: spec-cli
+    dir: cli
+    main: ./cmd/spec-cli
+    binary: spec-cli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - id: spec-cli
+    builds:
+      - spec-cli
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+
+release:
+  github:
+    owner: elijahmont3x
+    name: ClaudeCodeArchitect
