@@ -62,8 +62,8 @@ Usage:
   cca diff [commit]                Diff compiled output vs commit (default: HEAD~1)
   cca impact <attribute>           Show sections using attribute
   cca list                         List all sections in spec
-  cca skill                        Install/update Claude Code skill (project)
-  cca skill --global               Install/update skill for all projects
+  cca skill                        Install/update Claude Code skill
+  cca skill --global               Install to ~/.claude/skills (all projects)
   cca help                         Show this help
 
 Flags:
@@ -234,13 +234,9 @@ func runList() error {
 func runSkill() error {
 	// Parse flags
 	global := false
-	yes := false
 	for _, arg := range os.Args[2:] {
-		switch arg {
-		case "--global", "-g":
+		if arg == "--global" || arg == "-g" {
 			global = true
-		case "--yes", "-y":
-			yes = true
 		}
 	}
 
@@ -259,30 +255,22 @@ func runSkill() error {
 		location = "project (.claude/skills)"
 	}
 
-	embeddedVer := skill.GetEmbeddedVersion()
-
 	// Check if already installed
 	if skill.IsInstalled(skillDir) {
-		installedVer, _ := skill.GetInstalledVersion(skillDir)
+		installed, _ := skill.GetInstalledContent(skillDir)
+		embedded := skill.GetEmbeddedContent()
 
-		if installedVer == embeddedVer {
-			fmt.Printf("Skill already up to date (%s) at %s\n", embeddedVer, location)
+		if installed == embedded {
+			fmt.Printf("Skill already up to date at %s\n", location)
 			return nil
 		}
 
-		// Version differs - prompt for update
-		if !yes {
-			prompt := fmt.Sprintf("Update skill %s → %s at %s?", installedVer, embeddedVer, location)
-			if !skill.PromptYesNo(prompt) {
-				fmt.Println("Cancelled")
-				return nil
-			}
-		}
-
+		// Content differs - warn and update
+		fmt.Printf("Warning: Overwriting existing skill at %s\n", location)
 		if err := skill.Install(skillDir); err != nil {
 			return err
 		}
-		fmt.Printf("Updated skill %s → %s at %s\n", installedVer, embeddedVer, location)
+		fmt.Printf("Updated skill at %s\n", location)
 		return nil
 	}
 
@@ -290,19 +278,14 @@ func runSkill() error {
 	if err := skill.Install(skillDir); err != nil {
 		return err
 	}
-	fmt.Printf("Installed skill %s at %s\n", embeddedVer, location)
+	fmt.Printf("Installed skill at %s\n", location)
 	return nil
 }
 
 // checkSkillUpdate prints a notice if skill update is available
 func checkSkillUpdate() {
 	skillDir := skill.GetProjectSkillDir()
-	if !skill.IsInstalled(skillDir) {
-		return
-	}
-
-	needsUpdate, installed, embedded := skill.CheckUpdate(skillDir)
-	if needsUpdate {
-		fmt.Fprintf(os.Stderr, "Note: Skill update available (%s → %s). Run `cca skill` to update.\n\n", installed, embedded)
+	if skill.NeedsUpdate(skillDir) {
+		fmt.Fprintf(os.Stderr, "Note: Skill update available. Run `cca skill` to update.\n\n")
 	}
 }

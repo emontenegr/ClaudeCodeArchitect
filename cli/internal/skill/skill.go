@@ -1,13 +1,10 @@
 package skill
 
 import (
-	"bufio"
 	"embed"
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 )
 
 //go:embed SKILL.md
@@ -22,29 +19,14 @@ func GetEmbeddedContent() string {
 	return string(data)
 }
 
-// GetEmbeddedVersion extracts version from embedded skill
-func GetEmbeddedVersion() string {
-	return parseVersion(GetEmbeddedContent())
-}
-
-// GetInstalledVersion reads version from installed skill at path
-func GetInstalledVersion(skillDir string) (string, error) {
+// GetInstalledContent reads installed skill content
+func GetInstalledContent(skillDir string) (string, error) {
 	path := filepath.Join(skillDir, skillDirName, skillFileName)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
-	return parseVersion(string(data)), nil
-}
-
-// parseVersion extracts version from YAML frontmatter
-func parseVersion(content string) string {
-	re := regexp.MustCompile(`(?m)^version:\s*(.+)$`)
-	matches := re.FindStringSubmatch(content)
-	if len(matches) > 1 {
-		return strings.TrimSpace(matches[1])
-	}
-	return "unknown"
+	return string(data), nil
 }
 
 // IsInstalled checks if skill exists at the given skills directory
@@ -71,15 +53,16 @@ func Install(skillDir string) error {
 	return nil
 }
 
-// CheckUpdate compares installed vs embedded versions
-// Returns: needsUpdate, installedVersion, embeddedVersion
-func CheckUpdate(skillDir string) (bool, string, string) {
-	embeddedVer := GetEmbeddedVersion()
-	installedVer, err := GetInstalledVersion(skillDir)
-	if err != nil {
-		return false, "", embeddedVer
+// NeedsUpdate checks if installed skill differs from embedded
+func NeedsUpdate(skillDir string) bool {
+	if !IsInstalled(skillDir) {
+		return false
 	}
-	return installedVer != embeddedVer, installedVer, embeddedVer
+	installed, err := GetInstalledContent(skillDir)
+	if err != nil {
+		return false
+	}
+	return installed != GetEmbeddedContent()
 }
 
 // GetProjectSkillDir returns .claude/skills in current directory
@@ -94,13 +77,4 @@ func GetGlobalSkillDir() (string, error) {
 		return "", err
 	}
 	return filepath.Join(home, ".claude", "skills"), nil
-}
-
-// PromptYesNo asks user for y/n confirmation
-func PromptYesNo(prompt string) bool {
-	fmt.Print(prompt + " [y/N]: ")
-	reader := bufio.NewReader(os.Stdin)
-	response, _ := reader.ReadString('\n')
-	response = strings.TrimSpace(strings.ToLower(response))
-	return response == "y" || response == "yes"
 }
