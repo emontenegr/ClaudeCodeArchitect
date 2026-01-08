@@ -1,5 +1,6 @@
 ---
 name: adoc
+version: 0.1.0
 description: Handle AsciiDoc (.adoc) files. Use when you see .adoc files, MANIFEST.adoc, or spec/ folders. Never read .adoc files directly - use spec-cli to compile them first.
 ---
 

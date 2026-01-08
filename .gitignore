@@ -3,7 +3,6 @@
 bin/
 
 # IDE/Editor
-.claude/*
-!.claude/skills/
+.claude/
 .vscode/
 .idea/

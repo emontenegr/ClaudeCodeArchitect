@@ -103,20 +103,17 @@ npm install -g @asciidoctor/cli
 go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/spec-cli@latest
 ```
 
-### 2. Install Claude Code Skill (Optional)
-
-Copy the skill to your project for automatic spec-cli integration:
+### 2. Install Claude Code Skill
 
 ```bash
-# From your project root
-mkdir -p .claude/skills
-cp -r path/to/ClaudeCodeArchitect/.claude/skills/spec-cli .claude/skills/
+# Install to current project
+spec-cli skill
+
+# Or install globally (all projects)
+spec-cli skill --global
 ```
 
-Or copy to your personal skills folder for all projects:
-```bash
-cp -r path/to/ClaudeCodeArchitect/.claude/skills/spec-cli ~/.claude/skills/
-```
+The skill teaches Claude Code to use spec-cli automatically when working with AsciiDoc specs.
 
 ### 3. Create Your Spec
 

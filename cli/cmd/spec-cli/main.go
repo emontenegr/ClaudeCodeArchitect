@@ -10,6 +10,7 @@ import (
 	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/config"
 	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/differ"
 	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/impact"
+	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/skill"
 	"github.com/elijahmont3x/ClaudeCodeArchitect/cli/internal/validator"
 )
 
@@ -33,6 +34,8 @@ func main() {
 		err = runImpact()
 	case "list":
 		err = runList()
+	case "skill":
+		err = runSkill()
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -59,11 +62,13 @@ Usage:
   spec-cli diff [commit]                Diff compiled output vs commit (default: HEAD~1)
   spec-cli impact <attribute>           Show sections using attribute
   spec-cli list                         List all sections in spec
+  spec-cli skill                        Install/update Claude Code skill (project)
+  spec-cli skill --global               Install/update skill for all projects
   spec-cli help                         Show this help
 
 Flags:
   --quick, -q     Structural checks only, skip Claude semantic validation
-  --yes, -y       Skip interactive confirmation for large specs
+  --yes, -y       Skip interactive confirmation
 
 Configuration:
   Create .spec.yaml in your project root:
@@ -86,6 +91,8 @@ Examples:
 }
 
 func runCompile() error {
+	checkSkillUpdate()
+
 	specPath, err := config.FindSpec()
 	if err != nil {
 		return err
@@ -120,6 +127,8 @@ func runCompile() error {
 }
 
 func runValidate() error {
+	checkSkillUpdate()
+
 	specPath, err := config.FindSpec()
 	if err != nil {
 		return err
@@ -220,4 +229,80 @@ func runList() error {
 	fmt.Println("Sections in specification:\n")
 	fmt.Print(compiler.FormatSectionList(sections))
 	return nil
+}
+
+func runSkill() error {
+	// Parse flags
+	global := false
+	yes := false
+	for _, arg := range os.Args[2:] {
+		switch arg {
+		case "--global", "-g":
+			global = true
+		case "--yes", "-y":
+			yes = true
+		}
+	}
+
+	// Determine target directory
+	var skillDir string
+	var location string
+	if global {
+		var err error
+		skillDir, err = skill.GetGlobalSkillDir()
+		if err != nil {
+			return fmt.Errorf("failed to get home directory: %w", err)
+		}
+		location = "global (~/.claude/skills)"
+	} else {
+		skillDir = skill.GetProjectSkillDir()
+		location = "project (.claude/skills)"
+	}
+
+	embeddedVer := skill.GetEmbeddedVersion()
+
+	// Check if already installed
+	if skill.IsInstalled(skillDir) {
+		installedVer, _ := skill.GetInstalledVersion(skillDir)
+
+		if installedVer == embeddedVer {
+			fmt.Printf("Skill already up to date (%s) at %s\n", embeddedVer, location)
+			return nil
+		}
+
+		// Version differs - prompt for update
+		if !yes {
+			prompt := fmt.Sprintf("Update skill %s → %s at %s?", installedVer, embeddedVer, location)
+			if !skill.PromptYesNo(prompt) {
+				fmt.Println("Cancelled")
+				return nil
+			}
+		}
+
+		if err := skill.Install(skillDir); err != nil {
+			return err
+		}
+		fmt.Printf("Updated skill %s → %s at %s\n", installedVer, embeddedVer, location)
+		return nil
+	}
+
+	// Fresh install
+	if err := skill.Install(skillDir); err != nil {
+		return err
+	}
+	fmt.Printf("Installed skill %s at %s\n", embeddedVer, location)
+	return nil
+}
+
+// checkSkillUpdate prints a notice if skill update is available
+func checkSkillUpdate() {
+	skillDir := skill.GetProjectSkillDir()
+	if !skill.IsInstalled(skillDir) {
+		return
+	}
+
+	needsUpdate, installed, embedded := skill.CheckUpdate(skillDir)
+	if needsUpdate {
+		fmt.Fprintf(os.Stderr, "Note: Skill update available (%s → %s). Run `spec-cli skill` to update.\n\n", installed, embedded)
+	}
 }
