@@ -9,12 +9,7 @@ Provides an interface for AI assistants (like Claude Code) to read, validate, an
 ## Installation
 
 ```bash
-# If you have Go installed
-go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/cca@latest
-
-# Or build from source
-cd cli
-go build -o cca ./cmd/cca
+go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/cca@v0.1.0
 ```
 
 ## Commands
