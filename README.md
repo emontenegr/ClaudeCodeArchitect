@@ -47,6 +47,24 @@ User Authentication API
 
 **Result:** AI knows exactly what to build.
 
+## Get Started
+
+### 1. Install
+
+```bash
+npm install -g @asciidoctor/cli
+go install github.com/elijahmont3x/ClaudeCodeArchitect@v0.1.0
+```
+
+### 2. Try It
+
+```bash
+cd your-project
+cca skill              # Install Claude Code integration
+cca validate --quick   # Check your spec
+cca compile | head -50 # See compiled output
+```
+
 ## Core Principles
 
 1. **Decided, Not Deciding** - Every choice made before writing spec
@@ -56,97 +74,54 @@ User Authentication API
 5. **Mathematical Derivation** - Why every constant has its value
 6. **Modular Structure** - File-per-concern using AsciiDoc includes
 
-## Getting Started
+## Commands
 
-### 1. Read the Principles
-Start with foundational concepts:
-- [Foundational Principles](docs/principles.md) - Decided not deciding, zero conditionals, completeness
-- [Structural Requirements](docs/structure.md) - File organization, types, algorithms, data formats
+| Command | Purpose |
+|---------|---------|
+| `cca compile` | Full spec to Markdown |
+| `cca compile --section <name>` | Single section with attributes resolved |
+| `cca validate` | Structural + semantic completeness check |
+| `cca validate --quick` | Structural checks only (fast, no Claude) |
+| `cca diff [commit]` | Compiled output diff between commits |
+| `cca impact <attr>` | Show sections using an attribute |
+| `cca list` | List all sections |
+| `cca skill` | Install Claude Code skill |
 
-### 2. Learn the Frameworks
-Apply decision-making:
-- [Decision Frameworks](docs/frameworks.md) - When to be explicit vs let AI decide
-- [Anti-Patterns](docs/anti-patterns.md) - Common mistakes to avoid
+## How It Works
 
-### 3. Master Validation
-Ensure completeness:
-- [Validation Checklist](docs/validation.md) - 18-point completeness check
-- [Testing Framework](docs/testing.md) - What to test, what not to test
+### Compilation Pipeline
 
-### 4. Study Examples
-See it in practice:
-- [Simple API Example](examples/simple-api/) - Complete spec for user CRUD API
+1. Finds spec via `.spec.yaml` or convention (`MANIFEST.adoc`, `spec/MANIFEST.adoc`)
+2. Compiles AsciiDoc to HTML via asciidoctor
+3. Converts HTML to Markdown
+4. Outputs to stdout
 
-### 5. Check Language-Specific Patterns (Optional)
-- [Go Patterns](docs/languages/go.md) - text/template, embed, constants/config/secrets
+Key: `{api-p99-latency}` becomes `100ms` — Claude sees actual values, not placeholders.
 
-## Full Documentation
+### Validation Strategy
 
-- **[Principles](docs/principles.md)** - Core concepts that drive everything
-- **[Structure](docs/structure.md)** - How to organize specs modularly
-- **[Frameworks](docs/frameworks.md)** - Decision-making for specification
-- **[Anti-Patterns](docs/anti-patterns.md)** - What not to do
-- **[Workflow](docs/workflow.md)** - Git-based evolution and compilation
-- **[Testing](docs/testing.md)** - Test decision framework
-- **[Validation](docs/validation.md)** - Completeness checking
-- **[Implementation](docs/implementation.md)** - What to specify, what to omit
+Two-phase validation:
+1. **Structural (Go)**: Compiles? Has sections? Has key components?
+2. **Semantic (Claude)**: 18-point completeness checklist
 
-## Quick Start
+Large specs (>20KB) prompt for confirmation before Claude analysis. Use `--quick` for structural checks only.
 
-### 1. Install Tools
+### Requirements
 
-```bash
-# Install asciidoctor (required)
-npm install -g @asciidoctor/cli
+- **asciidoctor**: AsciiDoc compilation — `npm install -g @asciidoctor/cli`
+- **Claude CLI**: Semantic validation (optional, skip with `--quick`)
 
-# Install cca
-go install github.com/elijahmont3x/ClaudeCodeArchitect@v0.1.0
-```
+## Writing Specifications
 
-### 2. Install Claude Code Skill
+Learn the methodology:
 
-```bash
-# Install to current project
-cca skill
+1. **[Principles](docs/principles.md)** - Decided not deciding, zero conditionals, completeness
+2. **[Structure](docs/structure.md)** - File organization, types, algorithms, data formats
+3. **[Frameworks](docs/frameworks.md)** - When to be explicit vs let AI decide
+4. **[Anti-Patterns](docs/anti-patterns.md)** - Common mistakes to avoid
+5. **[Validation](docs/validation.md)** - 18-point completeness check
 
-# Or install globally (all projects)
-cca skill --global
-```
-
-The skill teaches Claude Code to use cca automatically when working with AsciiDoc specs.
-
-### 3. Create Your Spec
-
-```bash
-mkdir -p myproject/spec
-vim myproject/spec/MANIFEST.adoc
-```
-
-### 4. Validate and Implement
-
-```bash
-cd myproject
-
-# Validate spec completeness
-cca validate
-
-# Give to Claude Code
-cca compile  # Claude reads the output
-```
-
-## What Makes This Different
-
-**Traditional docs:** Explain what exists
-**Planning docs:** Explore possibilities
-**This system:** Define what to build
-
-Specifications are:
-- **Complete** (all decisions made)
-- **Quantified** (numbers, not words)
-- **Modular** (file-per-concern)
-- **Executable** (AI implements directly)
-
-***Not planning. Implementation blueprint.***
+See it in practice: **[Simple API Example](examples/simple-api/)**
 
 ## Example Structure
 
@@ -167,35 +142,16 @@ myproject/
 └── (implementation files)     # AI implements here
 ```
 
-## Success Metrics
+## Full Documentation
 
-- 90-95% completion rate without iteration
-- Zero "what should I do here?" questions from AI
-- Quantified, measurable requirements throughout
-- Complete on first implementation attempt
-
-## Domain Agnostic
-
-Works for any domain:
-- Web APIs
-- Game engines
-- ML pipelines
-- IoT firmware
-- Financial systems
-- Mobile apps
-
-Principles are universal. Your domain determines specifics.
-
-## Philosophy
-
-> **"Specifications are compiler input, not human documentation."**
-
-Write for the machine that will implement it.
-Make every decision before writing.
-Leave nothing ambiguous.
-Quantify everything.
-
-***The result:*** AI that builds exactly what you need, first time.
+- **[Principles](docs/principles.md)** - Core concepts
+- **[Structure](docs/structure.md)** - Modular organization
+- **[Frameworks](docs/frameworks.md)** - Decision-making
+- **[Anti-Patterns](docs/anti-patterns.md)** - What not to do
+- **[Workflow](docs/workflow.md)** - Git-based evolution
+- **[Testing](docs/testing.md)** - Test decision framework
+- **[Validation](docs/validation.md)** - Completeness checking
+- **[Implementation](docs/implementation.md)** - What to specify, what to omit
 
 ---
 
