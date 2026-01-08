@@ -2,32 +2,32 @@ version: '3'
 
 tasks:
   build-cli:
-    desc: Build spec-cli binary
+    desc: Build cca binary
     dir: cli
     cmds:
-      - go build -o ../bin/spec-cli{{if eq OS "windows"}}.exe{{end}} ./cmd/spec-cli
+      - go build -o ../bin/cca{{if eq OS "windows"}}.exe{{end}} ./cmd/cca
     sources:
       - cli/**/*.go
       - cli/go.mod
     generates:
-      - bin/spec-cli{{if eq OS "windows"}}.exe{{end}}
+      - bin/cca{{if eq OS "windows"}}.exe{{end}}
 
   install-cli:
-    desc: Install spec-cli to GOPATH/bin
+    desc: Install cca to GOPATH/bin
     dir: cli
     cmds:
-      - go install ./cmd/spec-cli
+      - go install ./cmd/cca
 
   test-cli:
-    desc: Test spec-cli with simple-api example
+    desc: Test cca with simple-api example
     dir: examples/simple-api
     cmds:
-      - ../../bin/spec-cli{{if eq OS "windows"}}.exe{{end}} validate --quick
-      - ../../bin/spec-cli{{if eq OS "windows"}}.exe{{end}} list
-      - ../../bin/spec-cli{{if eq OS "windows"}}.exe{{end}} impact api-p99-latency
+      - ../../bin/cca{{if eq OS "windows"}}.exe{{end}} validate --quick
+      - ../../bin/cca{{if eq OS "windows"}}.exe{{end}} list
+      - ../../bin/cca{{if eq OS "windows"}}.exe{{end}} impact api-p99-latency
 
   clean:
     desc: Clean build artifacts
     cmds:
-      - rm -f bin/spec-cli{{if eq OS "windows"}}.exe{{end}}
+      - rm -f bin/cca{{if eq OS "windows"}}.exe{{end}}
       - cd cli && go clean

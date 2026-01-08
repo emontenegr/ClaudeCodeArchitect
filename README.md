@@ -99,21 +99,21 @@ See it in practice:
 # Install asciidoctor (required)
 npm install -g @asciidoctor/cli
 
-# Install spec-cli
-go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/spec-cli@latest
+# Install cca
+go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/cca@latest
 ```
 
 ### 2. Install Claude Code Skill
 
 ```bash
 # Install to current project
-spec-cli skill
+cca skill
 
 # Or install globally (all projects)
-spec-cli skill --global
+cca skill --global
 ```
 
-The skill teaches Claude Code to use spec-cli automatically when working with AsciiDoc specs.
+The skill teaches Claude Code to use cca automatically when working with AsciiDoc specs.
 
 ### 3. Create Your Spec
 
@@ -128,10 +128,10 @@ vim myproject/spec/MANIFEST.adoc
 cd myproject
 
 # Validate spec completeness
-spec-cli validate
+cca validate
 
 # Give to Claude Code
-spec-cli compile  # Claude reads the output
+cca compile  # Claude reads the output
 ```
 
 ## What Makes This Different

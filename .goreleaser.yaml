@@ -1,16 +1,16 @@
 version: 2
 
-project_name: spec-cli
+project_name: cca
 
 before:
   hooks:
     - go mod tidy -C cli
 
 builds:
-  - id: spec-cli
+  - id: cca
     dir: cli
-    main: ./cmd/spec-cli
-    binary: spec-cli
+    main: ./cmd/cca
+    binary: cca
     env:
       - CGO_ENABLED=0
     goos:
@@ -24,9 +24,9 @@ builds:
       - -s -w
 
 archives:
-  - id: spec-cli
+  - id: cca
     builds:
-      - spec-cli
+      - cca
     format: tar.gz
     format_overrides:
       - goos: windows

@@ -1,4 +1,4 @@
-# spec-cli
+# cca
 
 CLI tool for compiling and validating architecture specifications for AI consumption.
 
@@ -10,11 +10,11 @@ Provides an interface for AI assistants (like Claude Code) to read, validate, an
 
 ```bash
 # If you have Go installed
-go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/spec-cli@latest
+go install github.com/elijahmont3x/ClaudeCodeArchitect/cli/cmd/cca@latest
 
 # Or build from source
 cd cli
-go build -o spec-cli ./cmd/spec-cli
+go build -o cca ./cmd/cca
 ```
 
 ## Commands
@@ -24,9 +24,9 @@ go build -o spec-cli ./cmd/spec-cli
 Compiles AsciiDoc spec to Markdown:
 
 ```bash
-spec-cli compile                      # Full spec to stdout
-spec-cli compile --section "API Spec" # Single section with attrs resolved
-spec-cli compile --section core/types.adoc
+cca compile                      # Full spec to stdout
+cca compile --section "API Spec" # Single section with attrs resolved
+cca compile --section core/types.adoc
 ```
 
 ### validate
@@ -34,9 +34,9 @@ spec-cli compile --section core/types.adoc
 Validates spec completeness using structural checks + Claude semantic analysis:
 
 ```bash
-spec-cli validate           # Full validation (structural + Claude)
-spec-cli validate --quick   # Structural checks only (fast, no Claude)
-spec-cli validate --yes     # Skip size confirmation for large specs
+cca validate           # Full validation (structural + Claude)
+cca validate --quick   # Structural checks only (fast, no Claude)
+cca validate --yes     # Skip size confirmation for large specs
 ```
 
 Requires Claude CLI for semantic validation. Install from: https://claude.ai/code
@@ -46,9 +46,9 @@ Requires Claude CLI for semantic validation. Install from: https://claude.ai/cod
 Compares compiled output between commits:
 
 ```bash
-spec-cli diff           # Compare with HEAD~1
-spec-cli diff HEAD~3    # Compare with 3 commits ago
-spec-cli diff main      # Compare with main branch
+cca diff           # Compare with HEAD~1
+cca diff HEAD~3    # Compare with 3 commits ago
+cca diff main      # Compare with main branch
 ```
 
 ### impact
@@ -56,7 +56,7 @@ spec-cli diff main      # Compare with main branch
 Shows which sections use an attribute:
 
 ```bash
-spec-cli impact api-p99-latency
+cca impact api-p99-latency
 ```
 
 Output:
@@ -74,7 +74,7 @@ Used in:
 Lists all sections in the spec:
 
 ```bash
-spec-cli list
+cca list
 ```
 
 ## Configuration
@@ -91,7 +91,7 @@ myproject/
 └── src/
 ```
 
-spec-cli automatically finds:
+cca automatically finds:
 - `MANIFEST.adoc`
 - `spec/MANIFEST.adoc`
 - `plan/MANIFEST.adoc`
@@ -147,14 +147,14 @@ Large specs (>20KB) prompt for confirmation. Use `--yes` to skip in CI.
 
 ```bash
 # Claude reads your spec
-spec-cli compile
+cca compile
 
 # Claude checks a specific section
-spec-cli compile --section "Database Schema"
+cca compile --section "Database Schema"
 
 # Claude checks attribute impact before changes
-spec-cli impact cache-ttl
+cca impact cache-ttl
 
 # Validate before implementation
-spec-cli validate
+cca validate
 ```

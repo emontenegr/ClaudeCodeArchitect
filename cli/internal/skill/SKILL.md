@@ -1,19 +1,19 @@
 ---
 name: adoc
 version: 0.1.0
-description: Handle AsciiDoc (.adoc) files. Use when you see .adoc files, MANIFEST.adoc, or spec/ folders. Never read .adoc files directly - use spec-cli to compile them first.
+description: Handle AsciiDoc (.adoc) files. Use when you see .adoc files, MANIFEST.adoc, or spec/ folders. Never read .adoc files directly - use cca to compile them first.
 ---
 
 # Architecture Specification Workflow
 
-This project uses `spec-cli` to manage architecture specifications. The spec is the source of truth - implement from it, don't guess.
+This project uses `cca` to manage architecture specifications. The spec is the source of truth - implement from it, don't guess.
 
 ## Reading the Spec
 
 Before implementing, read the compiled spec:
 
 ```bash
-spec-cli compile
+cca compile
 ```
 
 This outputs the full specification with all attributes resolved (e.g., `{api-p99-latency}` becomes `100ms`).
@@ -21,9 +21,9 @@ This outputs the full specification with all attributes resolved (e.g., `{api-p9
 For specific sections:
 
 ```bash
-spec-cli compile --section "API Endpoints"
-spec-cli compile --section "Database Schema"
-spec-cli compile --section core/types.adoc
+cca compile --section "API Endpoints"
+cca compile --section "Database Schema"
+cca compile --section core/types.adoc
 ```
 
 ## Validation
@@ -31,8 +31,8 @@ spec-cli compile --section core/types.adoc
 Before starting implementation, validate the spec is complete:
 
 ```bash
-spec-cli validate --quick   # Fast structural checks
-spec-cli validate           # Full validation with semantic analysis
+cca validate --quick   # Fast structural checks
+cca validate           # Full validation with semantic analysis
 ```
 
 If validation fails, the spec needs fixes before implementation.
@@ -42,12 +42,12 @@ If validation fails, the spec needs fixes before implementation.
 Before changing a spec attribute value, check what's affected:
 
 ```bash
-spec-cli impact <attribute-name>
+cca impact <attribute-name>
 ```
 
 Example:
 ```bash
-spec-cli impact api-p99-latency
+cca impact api-p99-latency
 ```
 
 Shows all sections using that attribute so you understand the change scope.
@@ -57,15 +57,15 @@ Shows all sections using that attribute so you understand the change scope.
 To see the spec structure:
 
 ```bash
-spec-cli list
+cca list
 ```
 
 ## Implementation Workflow
 
-1. **Read the spec first** - Run `spec-cli compile` to understand what you're building
+1. **Read the spec first** - Run `cca compile` to understand what you're building
 2. **Check specific sections** - Use `--section` for targeted reading
 3. **Implement exactly as specified** - The spec is complete; don't add unspecified features
-4. **Validate before finishing** - Run `spec-cli validate` to confirm spec compliance
+4. **Validate before finishing** - Run `cca validate` to confirm spec compliance
 
 ## Key Principles
 

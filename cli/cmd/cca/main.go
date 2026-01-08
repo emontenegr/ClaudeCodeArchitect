@@ -51,20 +51,20 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println(`spec-cli - Compile architecture specifications for AI consumption
+	fmt.Println(`cca - Claude Code Architect CLI
 
 Usage:
-  spec-cli compile                      Compile entire spec to Markdown (stdout)
-  spec-cli compile --section <name>     Compile specific section only
-  spec-cli validate                     Full validation (structural + Claude semantic)
-  spec-cli validate --quick             Structural checks only (no Claude)
-  spec-cli validate --yes               Skip confirmation for large specs
-  spec-cli diff [commit]                Diff compiled output vs commit (default: HEAD~1)
-  spec-cli impact <attribute>           Show sections using attribute
-  spec-cli list                         List all sections in spec
-  spec-cli skill                        Install/update Claude Code skill (project)
-  spec-cli skill --global               Install/update skill for all projects
-  spec-cli help                         Show this help
+  cca compile                      Compile entire spec to Markdown (stdout)
+  cca compile --section <name>     Compile specific section only
+  cca validate                     Full validation (structural + Claude semantic)
+  cca validate --quick             Structural checks only (no Claude)
+  cca validate --yes               Skip confirmation for large specs
+  cca diff [commit]                Diff compiled output vs commit (default: HEAD~1)
+  cca impact <attribute>           Show sections using attribute
+  cca list                         List all sections in spec
+  cca skill                        Install/update Claude Code skill (project)
+  cca skill --global               Install/update skill for all projects
+  cca help                         Show this help
 
 Flags:
   --quick, -q     Structural checks only, skip Claude semantic validation
@@ -74,19 +74,19 @@ Configuration:
   Create .spec.yaml in your project root:
     spec: ./MANIFEST.adoc
 
-  Or use convention - spec-cli looks for:
+  Or use convention - cca looks for:
     - MANIFEST.adoc
     - spec/MANIFEST.adoc
     - plan/MANIFEST.adoc
 
 Examples:
-  spec-cli compile                           # Full spec to stdout
-  spec-cli compile --section "API Spec"      # Single section with attrs resolved
-  spec-cli validate                          # Full validation with Claude
-  spec-cli validate --quick                  # Fast structural checks only
-  spec-cli validate --yes                    # Skip size confirmation (CI/scripts)
-  spec-cli diff HEAD~1                       # Compare with previous commit
-  spec-cli impact api-p99-latency            # Find attribute usages
+  cca compile                           # Full spec to stdout
+  cca compile --section "API Spec"      # Single section with attrs resolved
+  cca validate                          # Full validation with Claude
+  cca validate --quick                  # Fast structural checks only
+  cca validate --yes                    # Skip size confirmation (CI/scripts)
+  cca diff HEAD~1                       # Compare with previous commit
+  cca impact api-p99-latency            # Find attribute usages
 `)
 }
 
@@ -195,7 +195,7 @@ func runDiff() error {
 
 func runImpact() error {
 	if len(os.Args) < 3 {
-		return fmt.Errorf("usage: spec-cli impact <attribute-name>")
+		return fmt.Errorf("usage: cca impact <attribute-name>")
 	}
 
 	attrName := os.Args[2]
@@ -303,6 +303,6 @@ func checkSkillUpdate() {
 
 	needsUpdate, installed, embedded := skill.CheckUpdate(skillDir)
 	if needsUpdate {
-		fmt.Fprintf(os.Stderr, "Note: Skill update available (%s → %s). Run `spec-cli skill` to update.\n\n", installed, embedded)
+		fmt.Fprintf(os.Stderr, "Note: Skill update available (%s → %s). Run `cca skill` to update.\n\n", installed, embedded)
 	}
 }
