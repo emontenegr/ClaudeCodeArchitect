@@ -1,6 +1,6 @@
 ---
 name: adoc
-version: 0.1.0
+version: 0.2.0
 description: Handle AsciiDoc (.adoc) files. Use when you see .adoc files, MANIFEST.adoc, or spec/ folders. Never read .adoc files directly - use cca to compile them first.
 ---
 
