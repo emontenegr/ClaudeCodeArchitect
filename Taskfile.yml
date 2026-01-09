@@ -4,9 +4,9 @@ tasks:
   build:
     desc: Build cca binary
     cmds:
-      - go build -o bin/cca{{if eq OS "windows"}}.exe{{end}} .
+      - go build -o bin/cca{{if eq OS "windows"}}.exe{{end}} ./cmd/cca
     sources:
-      - "*.go"
+      - cmd/**/*.go
       - internal/**/*.go
       - go.mod
     generates:
@@ -15,7 +15,7 @@ tasks:
   install:
     desc: Install cca to GOPATH/bin
     cmds:
-      - go install .
+      - go install ./cmd/cca
 
   test:
     desc: Test cca with simple-api example

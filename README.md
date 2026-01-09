@@ -53,7 +53,7 @@ User Authentication API
 
 ```bash
 npm install -g @asciidoctor/cli
-go install github.com/elijahmont3x/ClaudeCodeArchitect@v0.1.0
+go install github.com/elijahmont3x/ClaudeCodeArchitect/cmd/cca@v0.1.0
 ```
 
 ### 2. Try It
