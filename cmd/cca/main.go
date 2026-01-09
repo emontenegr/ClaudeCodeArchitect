@@ -58,6 +58,7 @@ Usage:
   cca compile --section <name>     Compile specific section only
   cca validate                     Full validation (structural + Claude semantic)
   cca validate --quick             Structural checks only (no Claude)
+  cca validate --ultra             Enhanced validation (3x + synthesis)
   cca validate --yes               Skip confirmation for large specs
   cca diff [commit]                Diff compiled output vs commit (default: HEAD~1)
   cca impact <attribute>           Show sections using attribute
@@ -144,6 +145,8 @@ func runValidate() error {
 			quick = true
 		case "--yes", "-y":
 			opts.SkipConfirm = true
+		case "--ultra", "-u":
+			opts.Ultra = true
 		}
 	}
 

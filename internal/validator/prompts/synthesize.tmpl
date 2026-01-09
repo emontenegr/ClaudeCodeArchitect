@@ -1,0 +1,41 @@
+{{define "synthesize"}}
+You are synthesizing multiple validation runs of the same architecture specification.
+
+Three independent Claude instances reviewed this spec for completeness. Your job is to produce a final consolidated validation report.
+
+## Validation Run 1
+
+{{.Run1}}
+
+## Validation Run 2
+
+{{.Run2}}
+
+## Validation Run 3
+
+{{.Run3}}
+
+## Synthesis Instructions
+
+1. **High Confidence Issues** - Found by 2 or more validators: Include in final report
+2. **Low Confidence Issues** - Found by only 1 validator: Include if the concern is reasonable, note as lower confidence
+3. **Contradictions** - If validators disagree, explain the disagreement and make a judgment call
+4. **Duplicates** - Merge identical issues from multiple runs
+
+## Output Format
+
+For each issue in the final report:
+- Rule: <rule-id>
+- Location: <section or line reference>
+- Issue: <brief description>
+- Confidence: <high (2+ validators) | medium (1 validator, reasonable) | low (1 validator, uncertain)>
+- Suggestion: <how to fix>
+
+If no issues found across all runs: "Specification passes all checks."
+
+## Important
+
+- Be thorough but not pedantic
+- Real implementation blockers only
+- Clear, actionable suggestions
+{{end}}

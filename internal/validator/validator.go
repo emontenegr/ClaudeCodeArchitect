@@ -66,10 +66,16 @@ func Validate(manifestPath string, output io.Writer, opts ValidationOptions) (*V
 		return result, nil
 	}
 
-	// Run Claude validation
+	// Run Claude validation (ultra or normal)
 	result.SemanticRun = true
-	if err := RunClaudeValidation(compiledSpec, output); err != nil {
-		return nil, fmt.Errorf("semantic validation failed: %w", err)
+	if opts.Ultra {
+		if err := RunUltraValidation(compiledSpec, output); err != nil {
+			return nil, fmt.Errorf("ultra validation failed: %w", err)
+		}
+	} else {
+		if err := RunClaudeValidation(compiledSpec, output); err != nil {
+			return nil, fmt.Errorf("semantic validation failed: %w", err)
+		}
 	}
 
 	fmt.Fprintln(output)
