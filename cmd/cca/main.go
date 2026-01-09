@@ -14,6 +14,8 @@ import (
 	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/validator"
 )
 
+var version = "dev" // set via ldflags: -X main.version=
+
 func main() {
 	if len(os.Args) < 2 {
 		printUsage()
@@ -36,6 +38,9 @@ func main() {
 		err = runList()
 	case "skill":
 		err = runSkill()
+	case "version", "-v", "--version":
+		fmt.Printf("cca %s\n", version)
+		return
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -65,6 +70,7 @@ Usage:
   cca list                         List all sections in spec
   cca skill                        Install/update Claude Code skill
   cca skill --global               Install to ~/.claude/skills (all projects)
+  cca version                      Show version
   cca help                         Show this help
 
 Flags:
