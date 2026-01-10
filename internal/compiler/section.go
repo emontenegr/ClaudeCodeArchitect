@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/parser"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/parser"
 )
 
 // CompileSection compiles a specific section with attributes resolved

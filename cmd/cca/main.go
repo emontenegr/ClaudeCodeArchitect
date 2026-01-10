@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/compiler"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/config"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/differ"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/impact"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/skill"
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/validator"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/compiler"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/config"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/differ"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/impact"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/skill"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/validator"
 )
 
 var version = "dev" // set via ldflags: -X main.version=

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/elijahmont3x/ClaudeCodeArchitect/internal/compiler"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/compiler"
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
