@@ -22,7 +22,7 @@ func Validate(manifestPath string, output io.Writer, opts ValidationOptions) (*V
 	result := &ValidationResult{}
 
 	// Phase 1: Fast structural checks
-	fmt.Fprintln(output, "=== Phase 1: Structural Checks ===\n")
+	fmt.Fprint(output, "=== Phase 1: Structural Checks ===\n\n")
 
 	checks, err := RunStructuralChecks(manifestPath)
 	if err != nil {
@@ -40,10 +40,10 @@ func Validate(manifestPath string, output io.Writer, opts ValidationOptions) (*V
 		return result, nil
 	}
 
-	fmt.Fprintln(output, "✓ Structural checks passed\n")
+	fmt.Fprint(output, "✓ Structural checks passed\n\n")
 
 	// Phase 2: Semantic validation with Claude
-	fmt.Fprintln(output, "=== Phase 2: Semantic Validation (Claude) ===\n")
+	fmt.Fprint(output, "=== Phase 2: Semantic Validation (Claude) ===\n\n")
 
 	if !IsClaudeAvailable() {
 		return nil, fmt.Errorf("claude CLI not found - required for semantic validation\n\nInstall from: https://claude.ai/code\n\nOr use 'validate --quick' for structural checks only")

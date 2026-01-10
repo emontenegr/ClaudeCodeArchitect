@@ -85,49 +85,7 @@ func RunStructuralChecks(manifestPath string) ([]StructuralCheck, error) {
 	}
 	checks = append(checks, attrsCheck)
 
-	// Check 5: Has key sections (heuristic)
-	keySectionsCheck := checkKeySections(structure)
-	checks = append(checks, keySectionsCheck)
-
 	return checks, nil
-}
-
-// checkKeySections looks for commonly expected sections
-func checkKeySections(structure *parser.SpecStructure) StructuralCheck {
-	check := StructuralCheck{
-		ID:   "key-sections",
-		Name: "Key sections present",
-	}
-
-	// Common section keywords to look for
-	keyPatterns := []string{
-		"type", "api", "endpoint", "route",
-		"deploy", "test", "performance",
-	}
-
-	foundPatterns := []string{}
-	for _, section := range structure.Sections {
-		lower := strings.ToLower(section.Title)
-		for _, pattern := range keyPatterns {
-			if strings.Contains(lower, pattern) {
-				foundPatterns = append(foundPatterns, pattern)
-				break
-			}
-		}
-	}
-
-	if len(foundPatterns) >= 3 {
-		check.Passed = true
-		check.Message = fmt.Sprintf("Found key sections: %v", unique(foundPatterns))
-	} else if len(foundPatterns) > 0 {
-		check.Passed = true
-		check.Message = fmt.Sprintf("Found some key sections: %v (consider adding more)", unique(foundPatterns))
-	} else {
-		check.Passed = false
-		check.Message = "No recognizable key sections (types, API, deployment, etc.)"
-	}
-
-	return check
 }
 
 // AllStructuralChecksPassed returns true if all checks passed
@@ -156,14 +114,3 @@ func FormatStructuralChecks(checks []StructuralCheck) string {
 	return sb.String()
 }
 
-func unique(slice []string) []string {
-	seen := make(map[string]bool)
-	result := []string{}
-	for _, s := range slice {
-		if !seen[s] {
-			seen[s] = true
-			result = append(result, s)
-		}
-	}
-	return result
-}

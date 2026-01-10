@@ -3,12 +3,15 @@ package validator
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"embed"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
+	"syscall"
 	"text/template"
 	"time"
 )
@@ -54,6 +57,30 @@ func RenderPrompt(templateName string, data TemplateData) (string, error) {
 	}
 
 	return buf.String(), nil
+}
+
+// runClaudeValidationQuiet runs validation without spinner (for parallel runs)
+func runClaudeValidationQuiet(ctx context.Context, compiledSpec string, output io.Writer) error {
+	prompt, err := RenderPrompt("validate", TemplateData{
+		CompiledSpec: compiledSpec,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to render prompt: %w", err)
+	}
+
+	cmd := exec.CommandContext(ctx, "claude", "--print")
+	cmd.Stdin = strings.NewReader(prompt)
+	cmd.Stdout = output
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		return fmt.Errorf("claude CLI failed: %w", err)
+	}
+
+	return nil
 }
 
 // RunClaudeValidation shells out to claude CLI for semantic validation
@@ -132,27 +159,64 @@ func IsClaudeAvailable() bool {
 	return err == nil
 }
 
-// RunUltraValidation runs validation 3 times and synthesizes results
+// RunUltraValidation runs validation 3 times in parallel and synthesizes results
 func RunUltraValidation(compiledSpec string, output io.Writer) error {
-	runs := make([]string, 3)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
 
-	// Run validation 3 times
+	// Run 3 validations concurrently (silent)
+	type result struct {
+		output string
+		err    error
+		index  int
+	}
+	results := make(chan result, 3)
+
 	for i := 0; i < 3; i++ {
-		fmt.Fprintf(output, "=== Run %d/3 ===\n\n", i+1)
-
-		var buf bytes.Buffer
-		if err := RunClaudeValidation(compiledSpec, &buf); err != nil {
-			return fmt.Errorf("run %d failed: %w", i+1, err)
-		}
-		runs[i] = buf.String()
-
-		fmt.Fprint(output, runs[i])
-		fmt.Fprintln(output)
+		go func(idx int) {
+			var buf bytes.Buffer
+			err := runClaudeValidationQuiet(ctx, compiledSpec, &buf)
+			results <- result{output: buf.String(), err: err, index: idx}
+		}(i)
 	}
 
-	// Synthesize results
-	fmt.Fprintln(output, "=== Synthesizing Results ===\n")
+	// Same spinner as regular validation
+	done := make(chan bool)
+	go func() {
+		spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+		i := 0
+		for {
+			select {
+			case <-done:
+				return
+			case <-ctx.Done():
+				return
+			default:
+				fmt.Fprintf(output, "\rRunning Claude validation %s", spinner[i%len(spinner)])
+				i++
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
+	}()
 
+	// Collect results
+	runs := make([]string, 3)
+	for i := 0; i < 3; i++ {
+		r := <-results
+		if r.err != nil {
+			done <- true
+			if ctx.Err() != nil {
+				return fmt.Errorf("cancelled")
+			}
+			return fmt.Errorf("validation failed: %w", r.err)
+		}
+		runs[r.index] = r.output
+	}
+
+	done <- true
+	fmt.Fprint(output, "\r                                    \r")
+
+	// Synthesize results
 	synthesisPrompt, err := RenderPrompt("synthesize", TemplateData{
 		Run1: runs[0],
 		Run2: runs[1],
@@ -162,39 +226,17 @@ func RunUltraValidation(compiledSpec string, output io.Writer) error {
 		return fmt.Errorf("failed to render synthesis prompt: %w", err)
 	}
 
-	// Run synthesis with spinner
-	fmt.Fprint(output, "Synthesizing validation results ")
-
-	cmd := exec.Command("claude", "--print")
+	cmd := exec.CommandContext(ctx, "claude", "--print")
 	cmd.Stdin = strings.NewReader(synthesisPrompt)
 
 	var resultBuf bytes.Buffer
 	cmd.Stdout = &resultBuf
 	cmd.Stderr = os.Stderr
 
-	// Start spinner
-	done := make(chan bool)
-	go func() {
-		spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
-		i := 0
-		for {
-			select {
-			case <-done:
-				return
-			default:
-				fmt.Fprintf(output, "\rSynthesizing validation results %s", spinner[i%len(spinner)])
-				i++
-				time.Sleep(100 * time.Millisecond)
-			}
+	if err := cmd.Run(); err != nil {
+		if ctx.Err() != nil {
+			return fmt.Errorf("cancelled")
 		}
-	}()
-
-	err = cmd.Run()
-	done <- true
-
-	fmt.Fprint(output, "\r                                         \r")
-
-	if err != nil {
 		return fmt.Errorf("synthesis failed: %w", err)
 	}
 

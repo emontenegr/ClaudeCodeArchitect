@@ -13,19 +13,29 @@ type SpecConfig struct {
 	Spec string `yaml:"spec"`
 }
 
-// FindSpec discovers the specification file location
-// It checks .spec.yaml first, then falls back to conventions
+// FindSpec discovers the specification file location in the current directory
 func FindSpec() (string, error) {
+	return FindSpecInDir(".")
+}
+
+// FindSpecInDir discovers the specification file location in the given directory
+// It checks .spec.yaml first, then falls back to conventions
+func FindSpecInDir(dir string) (string, error) {
 	// 1. Check for .spec.yaml config
-	if config, err := LoadSpecConfig(); err == nil {
-		path := config.Spec
-		if !filepath.IsAbs(path) {
-			path, _ = filepath.Abs(path)
+	configPath := filepath.Join(dir, ".spec.yaml")
+	if data, err := os.ReadFile(configPath); err == nil {
+		var config SpecConfig
+		if err := yaml.Unmarshal(data, &config); err == nil {
+			path := config.Spec
+			if !filepath.IsAbs(path) {
+				path = filepath.Join(dir, path)
+			}
+			if _, err := os.Stat(path); err == nil {
+				absPath, _ := filepath.Abs(path)
+				return absPath, nil
+			}
+			return "", fmt.Errorf("spec file not found at configured path: %s", path)
 		}
-		if _, err := os.Stat(path); err == nil {
-			return path, nil
-		}
-		return "", fmt.Errorf("spec file not found at configured path: %s", path)
 	}
 
 	// 2. Check conventions
@@ -35,14 +45,15 @@ func FindSpec() (string, error) {
 		"plan/MANIFEST.adoc",
 	}
 
-	for _, path := range conventions {
+	for _, name := range conventions {
+		path := filepath.Join(dir, name)
 		if _, err := os.Stat(path); err == nil {
 			absPath, _ := filepath.Abs(path)
 			return absPath, nil
 		}
 	}
 
-	return "", fmt.Errorf("spec not found - checked: %v\nCreate .spec.yaml or use MANIFEST.adoc", conventions)
+	return "", fmt.Errorf("spec not found in %s - checked: %v\nCreate .spec.yaml or use MANIFEST.adoc", dir, conventions)
 }
 
 // LoadSpecConfig loads .spec.yaml configuration from the current directory

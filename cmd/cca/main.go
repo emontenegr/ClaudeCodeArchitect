@@ -56,7 +56,7 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println(`cca - Claude Code Architect CLI
+	fmt.Print(`cca - Claude Code Architect CLI
 
 Usage:
   cca compile                      Compile entire spec to Markdown (stdout)
@@ -136,16 +136,12 @@ func runCompile() error {
 func runValidate() error {
 	checkSkillUpdate()
 
-	specPath, err := config.FindSpec()
-	if err != nil {
-		return err
-	}
-
-	// Parse flags
+	// Parse flags and optional path argument
 	quick := false
 	opts := validator.ValidationOptions{}
+	dir := "."
 
-	for _, arg := range os.Args {
+	for _, arg := range os.Args[2:] {
 		switch arg {
 		case "--quick", "-q":
 			quick = true
@@ -153,7 +149,16 @@ func runValidate() error {
 			opts.SkipConfirm = true
 		case "--ultra", "-u":
 			opts.Ultra = true
+		default:
+			if !strings.HasPrefix(arg, "-") {
+				dir = arg
+			}
 		}
+	}
+
+	specPath, err := config.FindSpecInDir(dir)
+	if err != nil {
+		return err
 	}
 
 	if quick {
@@ -235,7 +240,7 @@ func runList() error {
 		return err
 	}
 
-	fmt.Println("Sections in specification:\n")
+	fmt.Print("Sections in specification:\n\n")
 	fmt.Print(compiler.FormatSectionList(sections))
 	return nil
 }
