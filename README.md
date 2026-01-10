@@ -51,6 +51,8 @@ User Authentication API
 
 ### 1. Install
 
+**Requirements:** Claude Code >= 2.1, Go 1.21+
+
 ```bash
 npm install -g @asciidoctor/cli
 go install github.com/emontenegr/ClaudeCodeArchitect/cmd/cca@latest
