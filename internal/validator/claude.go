@@ -29,6 +29,7 @@ const (
 type ValidationOptions struct {
 	SkipConfirm bool // --yes flag: skip size confirmation
 	Ultra       bool // --ultra flag: multi-run validation with synthesis
+	JSON        bool // --json flag: output JSON (for CI)
 }
 
 // TemplateData holds data passed to prompt templates

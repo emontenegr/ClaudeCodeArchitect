@@ -11,10 +11,10 @@ import (
 
 // ValidationResult represents the complete validation result
 type ValidationResult struct {
-	StructuralChecks []StructuralCheck
-	StructuralPassed bool
-	SemanticRun      bool
-	Cancelled        bool
+	StructuralChecks []StructuralCheck `json:"structural_checks"`
+	StructuralPassed bool              `json:"structural_passed"`
+	SemanticRun      bool              `json:"semantic_run"`
+	Cancelled        bool              `json:"cancelled"`
 }
 
 // Validate runs the hybrid validation: structural checks + Claude semantic analysis
@@ -36,11 +36,11 @@ func Validate(manifestPath string, output io.Writer, opts ValidationOptions) (*V
 
 	// If structural checks failed, stop here
 	if !result.StructuralPassed {
-		fmt.Fprintln(output, "❌ Structural checks failed. Fix these before semantic validation.")
+		fmt.Fprintln(output, "\033[31m✗\033[0m Structural checks failed. Fix these before semantic validation.")
 		return result, nil
 	}
 
-	fmt.Fprint(output, "✓ Structural checks passed\n\n")
+	fmt.Fprint(output, "\033[32m✓\033[0m Structural checks passed\n\n")
 
 	// Phase 2: Semantic validation with Claude
 	fmt.Fprint(output, "=== Phase 2: Semantic Validation (Claude) ===\n\n")

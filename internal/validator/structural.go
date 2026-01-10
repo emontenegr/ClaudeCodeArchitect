@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -10,10 +11,10 @@ import (
 
 // StructuralCheck represents a fast pre-flight check
 type StructuralCheck struct {
-	ID      string
-	Name    string
-	Passed  bool
-	Message string
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Passed  bool   `json:"passed"`
+	Message string `json:"message"`
 }
 
 // RunStructuralChecks performs fast pre-flight validation
@@ -98,19 +99,49 @@ func AllStructuralChecksPassed(checks []StructuralCheck) bool {
 	return true
 }
 
+// ANSI color codes
+const (
+	colorReset = "\033[0m"
+	colorGreen = "\033[32m"
+	colorRed   = "\033[31m"
+)
+
 // FormatStructuralChecks formats checks for display
 func FormatStructuralChecks(checks []StructuralCheck) string {
+	return formatStructuralChecks(checks, true)
+}
+
+// FormatStructuralChecksPlain formats checks without color
+func FormatStructuralChecksPlain(checks []StructuralCheck) string {
+	return formatStructuralChecks(checks, false)
+}
+
+func formatStructuralChecks(checks []StructuralCheck, color bool) string {
 	var sb strings.Builder
 
 	sb.WriteString("Structural Checks:\n")
 	for _, check := range checks {
 		if check.Passed {
-			sb.WriteString(fmt.Sprintf("  ✓ %s: %s\n", check.Name, check.Message))
+			if color {
+				sb.WriteString(fmt.Sprintf("  %s✓%s %s: %s\n", colorGreen, colorReset, check.Name, check.Message))
+			} else {
+				sb.WriteString(fmt.Sprintf("  ✓ %s: %s\n", check.Name, check.Message))
+			}
 		} else {
-			sb.WriteString(fmt.Sprintf("  ✗ %s: %s\n", check.Name, check.Message))
+			if color {
+				sb.WriteString(fmt.Sprintf("  %s✗%s %s: %s\n", colorRed, colorReset, check.Name, check.Message))
+			} else {
+				sb.WriteString(fmt.Sprintf("  ✗ %s: %s\n", check.Name, check.Message))
+			}
 		}
 	}
 
 	return sb.String()
+}
+
+// FormatStructuralChecksJSON formats checks as JSON
+func FormatStructuralChecksJSON(checks []StructuralCheck) string {
+	data, _ := json.MarshalIndent(checks, "", "  ")
+	return string(data)
 }
 

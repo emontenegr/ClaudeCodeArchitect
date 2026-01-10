@@ -7,16 +7,23 @@ import (
 	"strings"
 
 	"github.com/emontenegro/ClaudeCodeArchitect/internal/compiler"
+	"github.com/emontenegro/ClaudeCodeArchitect/internal/completion"
 	"github.com/emontenegro/ClaudeCodeArchitect/internal/config"
 	"github.com/emontenegro/ClaudeCodeArchitect/internal/differ"
 	"github.com/emontenegro/ClaudeCodeArchitect/internal/impact"
 	"github.com/emontenegro/ClaudeCodeArchitect/internal/skill"
 	"github.com/emontenegro/ClaudeCodeArchitect/internal/validator"
+	versionpkg "github.com/emontenegro/ClaudeCodeArchitect/internal/version"
 )
 
 var version = "dev" // set via ldflags: -X main.version=
 
 func main() {
+	// Check for updates (non-blocking, cached)
+	if latest := versionpkg.CheckForUpdate(version); latest != "" {
+		fmt.Fprintf(os.Stderr, "cca %s available (current: %s) - go install github.com/emontenegro/ClaudeCodeArchitect/cmd/cca@latest\n\n", latest, version)
+	}
+
 	if len(os.Args) < 2 {
 		printUsage()
 		os.Exit(1)
@@ -38,6 +45,9 @@ func main() {
 		err = runList()
 	case "skill":
 		err = runSkill()
+	case "completion":
+		runCompletion()
+		return
 	case "version", "-v", "--version":
 		fmt.Printf("cca %s\n", version)
 		return
@@ -70,12 +80,15 @@ Usage:
   cca list                         List all sections in spec
   cca skill                        Install/update Claude Code skill
   cca skill --global               Install to ~/.claude/skills (all projects)
+  cca completion [bash|zsh|fish]   Generate shell completion script
   cca version                      Show version
   cca help                         Show this help
 
 Flags:
   --quick, -q     Structural checks only, skip Claude semantic validation
+  --ultra, -u     Enhanced validation (3x parallel + synthesis)
   --yes, -y       Skip interactive confirmation
+  --json          Output JSON (for CI, use with --quick)
 
 Configuration:
   Create .spec.yaml in your project root:
@@ -149,6 +162,8 @@ func runValidate() error {
 			opts.SkipConfirm = true
 		case "--ultra", "-u":
 			opts.Ultra = true
+		case "--json":
+			opts.JSON = true
 		default:
 			if !strings.HasPrefix(arg, "-") {
 				dir = arg
@@ -166,7 +181,11 @@ func runValidate() error {
 		if err != nil {
 			return err
 		}
-		fmt.Print(validator.FormatStructuralChecks(result.StructuralChecks))
+		if opts.JSON {
+			fmt.Println(validator.FormatStructuralChecksJSON(result.StructuralChecks))
+		} else {
+			fmt.Print(validator.FormatStructuralChecks(result.StructuralChecks))
+		}
 		if !result.StructuralPassed {
 			os.Exit(1)
 		}
@@ -295,5 +314,24 @@ func runSkill() error {
 func checkSkillUpdate() {
 	if skill.NeedsUpdate(skill.GetProjectSkillDir()) {
 		fmt.Fprintf(os.Stderr, "Skill update available — run `cca skill`\n\n")
+	}
+}
+
+func runCompletion() {
+	shell := "bash"
+	if len(os.Args) > 2 {
+		shell = os.Args[2]
+	}
+
+	switch shell {
+	case "bash":
+		fmt.Print(completion.Bash())
+	case "zsh":
+		fmt.Print(completion.Zsh())
+	case "fish":
+		fmt.Print(completion.Fish())
+	default:
+		fmt.Fprintf(os.Stderr, "Unknown shell: %s (supported: bash, zsh, fish)\n", shell)
+		os.Exit(1)
 	}
 }
