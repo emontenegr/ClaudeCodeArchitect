@@ -69,7 +69,7 @@ func runClaudeValidationQuiet(ctx context.Context, compiledSpec string, output i
 		return fmt.Errorf("failed to render prompt: %w", err)
 	}
 
-	cmd := exec.CommandContext(ctx, "claude", "--print")
+	cmd := exec.CommandContext(ctx, "claude", "--print", "--no-session-persistence")
 	cmd.Stdin = strings.NewReader(prompt)
 	cmd.Stdout = output
 	cmd.Stderr = os.Stderr
@@ -104,7 +104,7 @@ func RunClaudeValidation(compiledSpec string, output io.Writer) error {
 	// Using --print for non-interactive mode
 	fmt.Fprint(output, "Running Claude validation ")
 
-	cmd := exec.Command("claude", "--print")
+	cmd := exec.Command("claude", "--print", "--no-session-persistence")
 	cmd.Stdin = strings.NewReader(prompt)
 
 	// Capture stdout to buffer while showing spinner
@@ -227,7 +227,7 @@ func RunUltraValidation(compiledSpec string, output io.Writer) error {
 		return fmt.Errorf("failed to render synthesis prompt: %w", err)
 	}
 
-	cmd := exec.CommandContext(ctx, "claude", "--print")
+	cmd := exec.CommandContext(ctx, "claude", "--print", "--no-session-persistence")
 	cmd.Stdin = strings.NewReader(synthesisPrompt)
 
 	var resultBuf bytes.Buffer

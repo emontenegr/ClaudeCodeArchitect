@@ -45,7 +45,7 @@ Ask: "If AI chooses differently, will it break something?"
 **Lookup operation:**
 
 * If called millions of times → **Specify:** `const table, O(1), no allocation`
-* If called occasionally → **Let AI decide:** `map, array, whatever works`
+* If called ocacasionally → **Let AI decide:** `map, array, whatever works`
 
 **Error handling:**
 
