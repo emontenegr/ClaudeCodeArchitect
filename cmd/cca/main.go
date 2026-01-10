@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/compiler"
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/completion"
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/config"
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/differ"
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/impact"
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/skill"
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/validator"
-	versionpkg "github.com/emontenegro/ClaudeCodeArchitect/internal/version"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/compiler"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/completion"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/config"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/differ"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/impact"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/skill"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/validator"
+	versionpkg "github.com/emontenegr/ClaudeCodeArchitect/internal/version"
 )
 
 var version = "dev" // set via ldflags: -X main.version=
@@ -21,7 +21,7 @@ var version = "dev" // set via ldflags: -X main.version=
 func main() {
 	// Check for updates (non-blocking, cached)
 	if latest := versionpkg.CheckForUpdate(version); latest != "" {
-		fmt.Fprintf(os.Stderr, "cca %s available (current: %s) - go install github.com/emontenegro/ClaudeCodeArchitect/cmd/cca@latest\n\n", latest, version)
+		fmt.Fprintf(os.Stderr, "cca %s available (current: %s) - go install github.com/emontenegr/ClaudeCodeArchitect/cmd/cca@latest\n\n", latest, version)
 	}
 
 	if len(os.Args) < 2 {

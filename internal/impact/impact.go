@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/parser"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/parser"
 )
 
 // AttributeImpact represents the impact analysis for a single attribute

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/compiler"
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/parser"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/compiler"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/parser"
 )
 
 // StructuralCheck represents a fast pre-flight check

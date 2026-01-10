@@ -1,4 +1,4 @@
-module github.com/emontenegro/ClaudeCodeArchitect
+module github.com/emontenegr/ClaudeCodeArchitect
 
 go 1.25
 

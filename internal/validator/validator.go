@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/emontenegro/ClaudeCodeArchitect/internal/compiler"
+	"github.com/emontenegr/ClaudeCodeArchitect/internal/compiler"
 )
 
 // ValidationResult represents the complete validation result
