@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/emontenegr/ClaudeCodeArchitect/internal/compiler"
@@ -18,10 +19,22 @@ import (
 
 var version = "dev" // set via ldflags: -X main.version=
 
+func getVersion() string {
+	// ldflags takes priority (goreleaser sets this)
+	if version != "dev" && version != "" {
+		return version
+	}
+	// go install embeds version in build info
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
+		return strings.TrimPrefix(info.Main.Version, "v")
+	}
+	return "dev"
+}
+
 func main() {
 	// Check for updates (non-blocking, cached)
-	if latest := versionpkg.CheckForUpdate(version); latest != "" {
-		fmt.Fprintf(os.Stderr, "cca %s available (current: %s) - go install github.com/emontenegr/ClaudeCodeArchitect/cmd/cca@latest\n\n", latest, version)
+	if latest := versionpkg.CheckForUpdate(getVersion()); latest != "" {
+		fmt.Fprintf(os.Stderr, "cca %s available (current: %s) - go install github.com/emontenegr/ClaudeCodeArchitect/cmd/cca@latest\n\n", latest, getVersion())
 	}
 
 	if len(os.Args) < 2 {
@@ -49,7 +62,7 @@ func main() {
 		runCompletion()
 		return
 	case "version", "-v", "--version":
-		fmt.Printf("cca %s\n", version)
+		fmt.Printf("cca %s\n", getVersion())
 		return
 	case "help", "-h", "--help":
 		printUsage()
