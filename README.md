@@ -38,14 +38,32 @@ Build a user API.
 
 ### After (Complete)
 ```
-User Authentication API
-- OAuth 2.0 + JWT (RS256)
-- PostgreSQL 16 (users table: id uuid, email varchar(255) unique, password_hash text)
-- Support 1000 req/sec, P99 <100ms
-- Rate limit: 100 requests/min per IP
+== Context
+
+Identity: User Authentication API
+Paradigm: Stateless JWT authentication
+
+Problem: Web app needs centralized auth - currently each service
+implements its own, causing inconsistent security.
+
+Approach: Issue JWT tokens on login, services validate locally
+without round-trip to auth service.
+
+Scope In: Registration, login, token refresh
+Scope Out: OAuth/social login, MFA (phase 2)
+
+Stack: Go 1.21, PostgreSQL 16, Redis 7
+
+== Implementation
+
+Types: User struct (id uuid, email string unique, password_hash bcrypt)
+Database: users table with indexes on email/username
+API: POST /login, GET /users/:id, PUT /users/:id, DELETE /users/:id
+Performance: P99 <100ms, support 1000 req/sec
+Rate limit: 100 requests/min per IP
 ```
 
-**Result:** AI knows exactly what to build.
+**Result:** AI knows WHAT to build AND WHY it exists. Can make correct judgment calls for unlisted edge cases.
 
 ## Get Started
 

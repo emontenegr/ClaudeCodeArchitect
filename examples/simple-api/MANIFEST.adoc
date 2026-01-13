@@ -7,15 +7,33 @@
 :db-connection-pool: 25
 :cache-ttl: 300s
 
-== System Metadata
+== Context
 
-*System Name:* User API Service
+=== Identity
+
+*Name:* User API Service
 
 *Paradigm:* RESTful API with JWT authentication
 
-*Foundation:* PostgreSQL 16 for persistence, Redis 7 for session cache
+=== Problem
+
+Web application needs user registration, authentication, and profile management. Currently no centralized user service exists.
+
+=== Approach
+
+Stateless authentication using JWT tokens. Users authenticate once, receive token, present token on subsequent requests. Session state cached in Redis for performance.
+
+=== Scope
+
+*In:* User CRUD operations, JWT authentication, session management
+
+*Out:* OAuth/social login, multi-factor authentication, role-based authorization (separate services)
+
+=== Stack
 
 *Language:* Go 1.21
+
+*Foundation:* PostgreSQL 16 for persistence, Redis 7 for session cache
 
 *Dependencies:*
 

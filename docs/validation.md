@@ -191,6 +191,37 @@ Verify each has concrete numbers.
 
 No unmeasurable adjectives.
 
+## Ambiguous Intent
+
+### Description
+
+Specification provides complete implementation details but leaves unstated priorities. AI must guess when resolving edge cases.
+
+### Recognition
+
+* Spec jumps directly into types/schemas without establishing purpose
+* Trade-off decisions have no stated rationale
+* Scope boundaries are implicit (what's NOT included is unclear)
+* Performance numbers lack justification (why 100ms, not 50ms?)
+
+### Reasoning
+
+An AI implementing this spec can produce syntactically correct code but may make wrong judgment calls for unlisted scenarios.
+
+Same spec with different intent contexts produces radically different implementations:
+* "Public API where abuse is common" → aggressive rate limiting
+* "Internal API for trusted services" → lenient limits
+
+The implementation details alone don't reveal which is correct.
+
+### Self-Check
+
+Ask: Could an AI infer the system's purpose from this spec?
+
+If the AI encountered an edge case not explicitly covered, would it know which direction to lean?
+
+If answers are no, intent is ambiguous. Add Problem/Approach/Scope to Context section.
+
 ## Self-Validation Process
 
 ### Procedure

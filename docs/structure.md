@@ -279,64 +279,105 @@ Route: POST /users
 * Requirement varies by component
 * Requirement is part of component's unique contract
 
-## Metadata Section
+## Context Section
 
 ### Specification
 
-Every `MANIFEST.adoc` begins with metadata describing system context.
+Every `MANIFEST.adoc` begins with context establishing intent and technical foundation.
 
-**Required fields:**
+**Structural elements:**
 
-* `system_name`: Specific name of this component
-* `paradigm`: Fundamental approach/architecture pattern
-* `foundation`: Core technologies/algorithms
-* `language`: Exact language + version
-* `dependencies`: Critical external services (if applicable)
+* `Identity`: What this system is
+* `Stack`: Technical foundation (language, dependencies, versions)
+* `Problem`: What gap this addresses (optional but valuable)
+* `Approach`: How the problem is addressed conceptually (optional)
+* `Scope`: What's included and explicitly excluded (optional)
 
-Metadata should be SPECIFIC to your system. NOT generic. NOT vague.
+Context provides AI with orientation for implementation and edge-case judgment.
 
-**Example:**
+**Minimal example:**
 
 ```asciidoc
-# User Authentication Service
+== Context
 
-[metadata]
-
-*System Name:* User Authentication Service
+=== Identity
+*Name:* User Authentication Service
 *Paradigm:* OAuth 2.0 + JWT token-based authentication
-*Foundation:* PostgreSQL 16 for user storage, Redis 7 for session cache
+
+=== Stack
 *Language:* Go 1.21
+*Foundation:* PostgreSQL 16 (users), Redis 7 (sessions)
 *Dependencies:*
 - PostgreSQL 16
 - Redis 7
 - SMTP service (SendGrid API v3)
+```
 
+**Full example:**
+
+```asciidoc
+== Context
+
+=== Identity
+*Name:* User Authentication Service
+*Paradigm:* OAuth 2.0 + JWT token-based authentication
+
+=== Problem
+Multiple services independently implement authentication, leading to
+inconsistent security and duplicated effort.
+
+=== Approach
+Single authentication service issues JWT tokens. Consuming services
+validate tokens locally without round-trip to auth service.
+
+=== Scope
+*In:* User registration, login, token refresh, password reset
+*Out:* Authorization (permissions), social login, MFA (phase 2)
+
+=== Stack
+*Language:* Go 1.21
+*Foundation:* PostgreSQL 16 (users), Redis 7 (sessions)
+*Dependencies:*
+- PostgreSQL 16
+- Redis 7
+- SMTP service (SendGrid API v3)
 ```
 
 ### Reasoning
 
-Metadata provides AI with immediate context about:
+Context serves two purposes:
 
+**1. Implementation Foundation**
+
+Identity and Stack tell AI:
 * What kind of system is being built
-* What constraints apply
 * What paradigms to follow
 * What dependencies exist
+* What language constraints apply
 
-Enables AI to make appropriate inferences for the rest of spec.
+**2. Intent Clarity**
+
+Problem, Approach, and Scope tell AI:
+* Why this system exists
+* How to think about the solution conceptually
+* What trade-offs were made
+* What is explicitly NOT included
+
+An AI implementing the spec uses Foundation for syntax, Intent for semantics.
 
 ### Adaptability Note
 
-Metadata fields vary by domain.
+Context elements vary by domain. Include what aids understanding for YOUR system.
 
-| Domain | Typical Metadata |
-|--------|------------------|
-| Web App | framework, database, auth_provider |
-| ML System | model_type, training_framework, inference_engine |
-| Game Engine | render_pipeline, physics_engine, asset_format |
-| IoT Firmware | microcontroller, RTOS, communication_protocol |
-| Fintech | regulatory_framework, ledger_system, settlement_protocol |
+| Domain | Typical Context Elements |
+|--------|--------------------------|
+| Web App | Problem (business gap), Stack (framework, database) |
+| ML System | Problem (prediction task), Approach (model architecture), Stack (training framework) |
+| Game Engine | Approach (rendering pipeline), Stack (graphics API, physics engine) |
+| IoT Firmware | Problem (device capability), Scope (hardware constraints), Stack (microcontroller, RTOS) |
+| Fintech | Problem (regulatory/business need), Scope (compliance boundaries), Stack (ledger system) |
 
-Include fields relevant to YOUR system's architectural decisions.
+Author decides which elements are valuable. Not all specs need full context.
 
 ## Type Definitions
 

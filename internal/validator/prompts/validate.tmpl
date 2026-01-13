@@ -23,6 +23,21 @@ Flag violations of these rules:
 16. **deployment**: Deployment configuration complete with specific platform
 17. **secrets-separated**: Config/secrets/constants properly separated
 18. **no-weak-language**: No weak obligation words ("should", "could", "might", "may") - use definitive language
+19. **intent-clarity**: System purpose and scope are clear - AI can infer intent for edge-case judgment (not prescriptive - different domains express this differently)
+
+## Intent Clarity Guidance
+
+Rule 19 checks whether an AI implementing this spec would understand:
+- What problem this system solves (why it exists)
+- What's explicitly in/out of scope (boundary clarity)
+- How to prioritize when trade-offs arise
+
+This is NOT checking for specific sections or formats. Different domains express intent differently:
+- A fintech spec might emphasize regulatory compliance
+- A game engine might emphasize performance/rendering approach
+- An internal tool might emphasize operational simplicity
+
+Flag as gap ONLY if intent is genuinely unclear, not if it's expressed in an unexpected way.
 
 ## Instructions
 
