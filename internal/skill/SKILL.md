@@ -3,24 +3,49 @@ name: adoc
 description: Handle AsciiDoc (.adoc) files. Use when you see .adoc files, MANIFEST.adoc, or spec/ folders. Never read .adoc files directly - use cca to compile them first.
 ---
 
-# Architecture Specification Workflow
+# Claude Code Architect (CCA)
 
-This project uses `cca` to manage architecture specifications. The spec is the source of truth - implement from it, don't guess.
+## What This Is
 
-## Understanding Specs: Context + Implementation
+This project uses **CCA** - a methodology and CLI for writing architecture specifications that AI can implement correctly on the first try.
 
-CCA specs have two layers:
+**Goal:** 90-95% production-ready implementation from written spec, zero iteration.
 
-**Context** - Intent and foundation (what/why/scope):
-- Identity: What this system is
+**How:** Specifications are complete, decided, quantified - like compiler input. They contain:
+- Context (why, scope, approach)
+- Complete implementation details (types, schemas, APIs, performance)
+
+## Command Reference
+
+| Command | Purpose |
+|---------|---------|
+| `cca compile` | Compile spec to readable Markdown (resolves includes/attributes) |
+| `cca compile --section <name>` | Compile specific section only |
+| `cca validate` | Full validation (structural + semantic via Claude) |
+| `cca validate --quick` | Fast structural checks only |
+| `cca validate --ultra` | Enhanced validation (3x parallel + synthesis) |
+| `cca diff [commit]` | Diff compiled output vs git commit |
+| `cca impact <attribute>` | Show which sections use an attribute |
+| `cca list` | List all sections in spec |
+| `cca skill` | Install/update this Claude Code skill |
+
+## Spec Structure
+
+CCA specs are modular AsciiDoc files with two layers:
+
+**Context** - Intent and foundation:
+- Identity: What this system is (name, paradigm)
 - Stack: Technical foundation (language, dependencies, versions)
-- Problem: What gap this addresses (optional)
+- Problem: What gap this addresses (optional but valuable)
 - Approach: How problem is solved conceptually (optional)
 - Scope: What's in, what's explicitly out (optional)
 
-**Implementation** - Complete technical details (types, schemas, APIs, performance)
+**Implementation** - Complete technical details:
+- Types, schemas, APIs, algorithms
+- Performance requirements (quantified)
+- Deployment, testing specifications
 
-Both are necessary. Context alone is vague. Implementation alone is mechanically complete but semantically ambiguous. Together they enable one-shot AI implementation.
+Both are necessary. Context provides intent for edge-case judgment. Implementation provides mechanical completeness.
 
 ## Reading the Spec
 
