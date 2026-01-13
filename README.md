@@ -43,8 +43,8 @@ Build a user API.
 Identity: User Authentication API
 Paradigm: Stateless JWT authentication
 
-Problem: Web app needs centralized auth - currently each service
-implements its own, causing inconsistent security.
+Abstract: REST API for user registration, authentication, and
+profile management.
 
 Approach: Issue JWT tokens on login, services validate locally
 without round-trip to auth service.

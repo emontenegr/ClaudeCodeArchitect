@@ -15,9 +15,9 @@
 
 *Paradigm:* RESTful API with JWT authentication
 
-=== Problem
+=== Abstract
 
-Web application needs user registration, authentication, and profile management. Currently no centralized user service exists.
+REST API service providing user registration, authentication, and profile management for web applications.
 
 === Approach
 

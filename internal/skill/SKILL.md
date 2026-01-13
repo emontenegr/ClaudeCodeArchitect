@@ -36,7 +36,7 @@ CCA specs are modular AsciiDoc files with two layers:
 **Context** - Intent and foundation:
 - Identity: What this system is (name, paradigm)
 - Stack: Technical foundation (language, dependencies, versions)
-- Problem: What gap this addresses (optional but valuable)
+- Abstract: What gap this addresses (optional but valuable)
 - Approach: How problem is solved conceptually (optional)
 - Scope: What's in, what's explicitly out (optional)
 
@@ -74,7 +74,7 @@ When helping a user write a specification:
 Every `MANIFEST.adoc` begins with `== Context`. Guide the user to include:
 - **Identity** (required): Name, paradigm
 - **Stack** (required): Language, dependencies with exact versions
-- **Problem** (valuable for non-trivial systems): What gap this addresses
+- **Abstract** (valuable for non-trivial systems): What gap this addresses
 - **Approach** (valuable): How problem is solved conceptually
 - **Scope** (valuable): Explicit in/out boundaries
 
@@ -98,7 +98,7 @@ A spec is incomplete if an implementing AI would need to guess:
 - Trade-off priorities
 - Scope boundaries
 
-Validation checks for "Ambiguous Intent." If Problem/Approach/Scope are absent and system is non-trivial, validation will flag this.
+Validation checks for "Ambiguous Intent." If Abstract/Approach/Scope are absent and system is non-trivial, validation will flag this.
 
 **3. Run Validation During Writing**
 
@@ -120,7 +120,7 @@ cca compile --section Context
 ```
 
 The Context section tells you:
-- What this system is for (Problem)
+- What this system is for (Abstract)
 - How to think about the solution (Approach)
 - What's explicitly excluded (Scope)
 
@@ -158,7 +158,7 @@ The spec is complete - don't add unspecified features. If something seems missin
 **4. Use Context for Edge-Case Judgment**
 
 When you encounter a scenario not explicitly covered:
-- Check Context > Problem: What is this system for?
+- Check Context > Abstract: What is this system for?
 - Check Context > Approach: How should I think about solutions?
 - Check Context > Scope: Is this in or out?
 

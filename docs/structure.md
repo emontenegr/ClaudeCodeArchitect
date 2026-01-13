@@ -289,8 +289,8 @@ Every `MANIFEST.adoc` begins with context establishing intent and technical foun
 
 * `Identity`: What this system is
 * `Stack`: Technical foundation (language, dependencies, versions)
-* `Problem`: What gap this addresses (optional but valuable)
-* `Approach`: How the problem is addressed conceptually (optional)
+* `Abstract`: What this system is and does (optional but valuable)
+* `Approach`: How this works conceptually (optional)
 * `Scope`: What's included and explicitly excluded (optional)
 
 Context provides AI with orientation for implementation and edge-case judgment.
@@ -322,9 +322,9 @@ Context provides AI with orientation for implementation and edge-case judgment.
 *Name:* User Authentication Service
 *Paradigm:* OAuth 2.0 + JWT token-based authentication
 
-=== Problem
-Multiple services independently implement authentication, leading to
-inconsistent security and duplicated effort.
+=== Abstract
+User authentication service that centralizes auth across multiple services.
+Issues JWT tokens for stateless authentication.
 
 === Approach
 Single authentication service issues JWT tokens. Consuming services
@@ -357,8 +357,8 @@ Identity and Stack tell AI:
 
 **2. Intent Clarity**
 
-Problem, Approach, and Scope tell AI:
-* Why this system exists
+Abstract, Approach, and Scope tell AI:
+* What this system is and does
 * How to think about the solution conceptually
 * What trade-offs were made
 * What is explicitly NOT included
@@ -371,11 +371,11 @@ Context elements vary by domain. Include what aids understanding for YOUR system
 
 | Domain | Typical Context Elements |
 |--------|--------------------------|
-| Web App | Problem (business gap), Stack (framework, database) |
-| ML System | Problem (prediction task), Approach (model architecture), Stack (training framework) |
-| Game Engine | Approach (rendering pipeline), Stack (graphics API, physics engine) |
-| IoT Firmware | Problem (device capability), Scope (hardware constraints), Stack (microcontroller, RTOS) |
-| Fintech | Problem (regulatory/business need), Scope (compliance boundaries), Stack (ledger system) |
+| Web App | Abstract (what it does), Stack (framework, database) |
+| ML System | Abstract (prediction task), Approach (model architecture), Stack (training framework) |
+| Game Engine | Abstract (purpose), Approach (rendering pipeline), Stack (graphics API, physics engine) |
+| IoT Firmware | Abstract (device capability), Scope (hardware constraints), Stack (microcontroller, RTOS) |
+| Fintech | Abstract (system purpose), Scope (compliance boundaries), Stack (ledger system) |
 
 Author decides which elements are valuable. Not all specs need full context.
 

@@ -220,7 +220,7 @@ Ask: Could an AI infer the system's purpose from this spec?
 
 If the AI encountered an edge case not explicitly covered, would it know which direction to lean?
 
-If answers are no, intent is ambiguous. Add Problem/Approach/Scope to Context section.
+If answers are no, intent is ambiguous. Add Abstract/Approach/Scope to Context section.
 
 ## Self-Validation Process
 
