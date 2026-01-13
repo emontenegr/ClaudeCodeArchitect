@@ -37,6 +37,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "cca %s available (current: %s) - go install github.com/emontenegr/ClaudeCodeArchitect/cmd/cca@latest\n\n", latest, getVersion())
 	}
 
+	// Check for skill update (any command)
+	if skill.NeedsUpdate(skill.GetProjectSkillDir()) {
+		fmt.Fprintf(os.Stderr, "Skill update available — run `cca skill`\n\n")
+	}
+
 	if len(os.Args) < 2 {
 		printUsage()
 		os.Exit(1)
@@ -124,8 +129,6 @@ Examples:
 }
 
 func runCompile() error {
-	checkSkillUpdate()
-
 	specPath, err := config.FindSpec()
 	if err != nil {
 		return err
@@ -160,8 +163,6 @@ func runCompile() error {
 }
 
 func runValidate() error {
-	checkSkillUpdate()
-
 	// Parse flags and optional path argument
 	quick := false
 	opts := validator.ValidationOptions{}
@@ -321,13 +322,6 @@ func runSkill() error {
 	}
 	fmt.Printf("Skill installed%s\n", suffix)
 	return nil
-}
-
-// checkSkillUpdate prints a notice if skill update is available
-func checkSkillUpdate() {
-	if skill.NeedsUpdate(skill.GetProjectSkillDir()) {
-		fmt.Fprintf(os.Stderr, "Skill update available — run `cca skill`\n\n")
-	}
 }
 
 func runCompletion() {

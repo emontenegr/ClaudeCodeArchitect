@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"text/template"
 	"time"
+
+	"golang.org/x/term"
 )
 
 //go:embed prompts/*.tmpl
@@ -102,8 +104,6 @@ func RunClaudeValidation(compiledSpec string, output io.Writer) error {
 
 	// Run claude with prompt via stdin (avoids command line length limits)
 	// Using --print for non-interactive mode
-	fmt.Fprint(os.Stderr, "Running Claude validation ")
-
 	cmd := exec.Command("claude", "--print", "--no-session-persistence")
 	cmd.Stdin = strings.NewReader(prompt)
 
@@ -112,28 +112,35 @@ func RunClaudeValidation(compiledSpec string, output io.Writer) error {
 	cmd.Stdout = &resultBuf
 	cmd.Stderr = os.Stderr
 
-	// Start spinner in goroutine (write to stderr for proper terminal handling)
+	// Show spinner only if stderr is a terminal
+	showSpinner := isTTY()
+	if showSpinner {
+		fmt.Fprint(os.Stderr, "Running Claude validation ")
+	}
+
 	done := make(chan bool)
-	go func() {
-		spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
-		i := 0
-		for {
-			select {
-			case <-done:
-				return
-			default:
-				fmt.Fprintf(os.Stderr, "\rRunning Claude validation %s", spinner[i%len(spinner)])
-				i++
-				time.Sleep(100 * time.Millisecond)
+	if showSpinner {
+		go func() {
+			spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+			i := 0
+			for {
+				select {
+				case <-done:
+					return
+				default:
+					fmt.Fprintf(os.Stderr, "\rRunning Claude validation %s", spinner[i%len(spinner)])
+					i++
+					time.Sleep(100 * time.Millisecond)
+				}
 			}
-		}
-	}()
+		}()
+	}
 
 	err = cmd.Run()
-	done <- true
-
-	// Clear spinner line and show result
-	fmt.Fprint(os.Stderr, "\r                                    \r")
+	if showSpinner {
+		done <- true
+		fmt.Fprint(os.Stderr, "\r                                    \r")
+	}
 
 	if err != nil {
 		return fmt.Errorf("claude CLI failed: %w", err)
@@ -160,6 +167,11 @@ func IsClaudeAvailable() bool {
 	return err == nil
 }
 
+// isTTY checks if stderr is a terminal (for spinner support)
+func isTTY() bool {
+	return term.IsTerminal(int(os.Stderr.Fd()))
+}
+
 // RunUltraValidation runs validation 3 times in parallel and synthesizes results
 func RunUltraValidation(compiledSpec string, output io.Writer) error {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -181,31 +193,37 @@ func RunUltraValidation(compiledSpec string, output io.Writer) error {
 		}(i)
 	}
 
-	// Spinner writes to stderr for proper terminal handling
+	// Show spinner only if stderr is a terminal
+	showSpinner := isTTY()
 	done := make(chan bool)
-	go func() {
-		spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
-		i := 0
-		for {
-			select {
-			case <-done:
-				return
-			case <-ctx.Done():
-				return
-			default:
-				fmt.Fprintf(os.Stderr, "\rRunning Claude validation %s", spinner[i%len(spinner)])
-				i++
-				time.Sleep(100 * time.Millisecond)
+
+	if showSpinner {
+		go func() {
+			spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+			i := 0
+			for {
+				select {
+				case <-done:
+					return
+				case <-ctx.Done():
+					return
+				default:
+					fmt.Fprintf(os.Stderr, "\rRunning Claude validation %s", spinner[i%len(spinner)])
+					i++
+					time.Sleep(100 * time.Millisecond)
+				}
 			}
-		}
-	}()
+		}()
+	}
 
 	// Collect results
 	runs := make([]string, 3)
 	for i := 0; i < 3; i++ {
 		r := <-results
 		if r.err != nil {
-			done <- true
+			if showSpinner {
+				done <- true
+			}
 			if ctx.Err() != nil {
 				return fmt.Errorf("cancelled")
 			}
@@ -214,8 +232,10 @@ func RunUltraValidation(compiledSpec string, output io.Writer) error {
 		runs[r.index] = r.output
 	}
 
-	done <- true
-	fmt.Fprint(os.Stderr, "\r                                    \r")
+	if showSpinner {
+		done <- true
+		fmt.Fprint(os.Stderr, "\r                                    \r")
+	}
 
 	// Synthesize results
 	synthesisPrompt, err := RenderPrompt("synthesize", TemplateData{
