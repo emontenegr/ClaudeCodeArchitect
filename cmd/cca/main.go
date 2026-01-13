@@ -37,17 +37,17 @@ func main() {
 		fmt.Fprintf(os.Stderr, "cca %s available (current: %s) - go install github.com/emontenegr/ClaudeCodeArchitect/cmd/cca@latest\n\n", latest, getVersion())
 	}
 
-	// Check for skill update (any command)
-	if skill.NeedsUpdate(skill.GetProjectSkillDir()) {
-		fmt.Fprintf(os.Stderr, "Skill update available — run `cca skill`\n\n")
-	}
-
 	if len(os.Args) < 2 {
 		printUsage()
 		os.Exit(1)
 	}
 
 	command := os.Args[1]
+
+	// Check for skill update (skip if running skill command itself)
+	if command != "skill" && skill.NeedsUpdate(skill.GetProjectSkillDir()) {
+		fmt.Fprintf(os.Stderr, "Skill update available — run `cca skill`\n\n")
+	}
 
 	var err error
 	switch command {
