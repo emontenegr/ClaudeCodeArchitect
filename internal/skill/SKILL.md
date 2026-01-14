@@ -148,14 +148,39 @@ cca impact api-p99-latency
 
 Shows all sections using that attribute so you understand the change scope.
 
-**3. Implement Exactly As Specified**
+**3. When Spec Code Doesn't Compile: Research, Don't Patch**
+
+CRITICAL: If example code in the spec doesn't match the library API:
+
+**DON'T:**
+- Delete the code to make it compile
+- Comment it out and move on
+- Declare success when build passes
+
+**DO:**
+- Research the actual library API (use `go doc`, check docs, read source)
+- Understand the INTENT of the spec code (what is it trying to achieve?)
+- Implement that intent using the correct API
+- If the API doesn't support it, ask the user
+
+**Example:**
+```
+Spec shows: ta.PromptStyle = titleStyle
+Build error: PromptStyle field doesn't exist
+WRONG: Delete the line → build passes → done
+RIGHT: Research bubbles/textarea styling API → find correct method → implement prompt styling
+```
+
+Build passing is NOT the success criterion. Correct implementation of intent is.
+
+**4. Implement Exactly As Specified**
 
 The spec is complete - don't add unspecified features. If something seems missing, it's either:
 - In the spec (search more carefully)
 - Explicitly excluded (check Scope section)
 - Actually missing (validation should have caught this - ask user)
 
-**4. Use Context for Edge-Case Judgment**
+**5. Use Context for Edge-Case Judgment**
 
 When you encounter a scenario not explicitly covered:
 - Check Context > Abstract: What is this system for?
