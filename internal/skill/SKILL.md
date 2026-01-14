@@ -189,6 +189,57 @@ When you encounter a scenario not explicitly covered:
 
 Example: Spec doesn't say how to handle empty field in PUT request. Context says "Internal tool prioritizing simplicity" → reject invalid input, don't add complex partial update logic.
 
+**6. Commit Atomically As You Implement**
+
+CRITICAL: Don't implement everything then commit once. Commit after each spec section.
+
+**Workflow:**
+```
+Read spec section → Implement component → Verify it works → Commit → Next section
+```
+
+**Commit granularity:**
+- Per spec section (Types, Database, API, Deployment)
+- Or per logical component if section is large
+
+**Commit message format:**
+```
+Implement [component name] (spec: [section name])
+
+[1-2 sentences on what was implemented]
+
+Spec-driven-by: CCA
+```
+
+**Example:**
+```
+Implement core type definitions (spec: Core Types)
+
+Added User, Session, and Config structs with all fields,
+validation rules, and invariants per specification.
+
+Spec-driven-by: CCA
+```
+
+**Why this matters:**
+
+1. **Verification:** Each commit is a checkpoint - you verify component works before moving on
+2. **Traceability:** Git history maps to spec structure - easy to find which code implements which spec section
+3. **Review:** User can review commit-by-commit instead of massive final diff
+4. **Debugging:** If something breaks, git log shows exactly which component/section
+5. **Spec evolution:** When spec changes, commit messages show what implementation needs updating
+
+**What to verify before committing:**
+- Component compiles (if applicable)
+- Component tests pass (if you wrote tests for it)
+- Integrates with previous commits (no breaking changes)
+
+**Don't:**
+- Commit with "WIP", "fix", "temp" messages
+- Commit broken code to "fix later"
+- Make one giant commit at the end
+- Skip CCA attribution
+
 ## Listing Sections
 
 To see the spec structure:
