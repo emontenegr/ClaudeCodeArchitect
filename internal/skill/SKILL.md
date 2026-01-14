@@ -208,7 +208,7 @@ Implement [component name] (spec: [section name])
 
 [1-2 sentences on what was implemented]
 
-Spec-driven-by: CCA
+CCA-Spec: [section name]
 ```
 
 **Example:**
@@ -218,7 +218,7 @@ Implement core type definitions (spec: Core Types)
 Added User, Session, and Config structs with all fields,
 validation rules, and invariants per specification.
 
-Spec-driven-by: CCA
+CCA-Spec: Core Types
 ```
 
 **Why this matters:**
@@ -238,7 +238,7 @@ Spec-driven-by: CCA
 - Commit with "WIP", "fix", "temp" messages
 - Commit broken code to "fix later"
 - Make one giant commit at the end
-- Skip CCA attribution
+- Omit `CCA-Spec:` trailer (needed for traceability)
 
 ## Listing Sections
 
