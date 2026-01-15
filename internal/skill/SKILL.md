@@ -253,6 +253,10 @@ CCA-Spec: Core Types
 
 CONSTITUTIONAL RULE: You may NOT declare implementation complete until passing this verification.
 
+**IMPORTANT:** This is an INTERNAL checklist. Verify silently, report only:
+- "Implementation complete" (if all checks pass), OR
+- "Spec gap: [specific scenario not covered]" (if spec is incomplete)
+
 **Step 1: Spec Faithfulness - Section Mapping**
 
 List every spec section with implementation status:
@@ -270,22 +274,36 @@ If ANY section shows "NOT IMPLEMENTED":
 - If required and not excluded: implement it now
 - If unclear: STOP and ask user "Does spec require X? Section Y doesn't specify it."
 
-**Step 2: Invention Check**
+**Step 2: Spec Divergence Check**
 
 Answer:
 
 ```
-Q1: Did I implement any features NOT in the spec?
-[List any features you added that spec doesn't mention]
+Q1: Did I implement differently than spec shows?
+[List any place where code differs from spec examples/descriptions]
 
-Q2: Did I make any architectural choices the spec doesn't specify?
-[List any decisions you made that spec leaves open]
+Q2: Did I make any choices the spec leaves unspecified?
+[List any decisions you made that spec doesn't cover]
 ```
 
-If Q1 or Q2 have items:
+**If Q1 has items (divergence from spec):**
+- STOP and report: "Spec divergence: [what spec says] vs [what I implemented] because [reason]. Spec should be updated."
+- Even if justified (technical necessity), spec must stay accurate
+- User updates spec, then you continue
+
+**If Q2 has items (spec doesn't specify):**
 - Check if Context (Abstract/Approach/Scope) guided the decision
-- If Context supports it: OK
-- If not in spec at all: STOP and ask user "Should I add [feature]? Spec doesn't mention it."
+- If Context supports it: OK (document in commit message)
+- If not in spec or Context: STOP and ask user
+
+**Example:**
+
+❌ WRONG:
+"Spec shows value receivers but Bubble Tea requires pointers. Changed to pointers. Justified by technical necessity."
+→ You created spec divergence without reporting it.
+
+✅ CORRECT:
+"Spec divergence found: Spec shows value receivers (line 45), but Bubble Tea requires pointer receivers for state mutation. Implementation uses pointers. **Spec should be updated to show pointer receivers.** Stopping until spec is corrected."
 
 **Step 3: Deferral Detection**
 
@@ -358,6 +376,17 @@ Your job is faithful implementation, not gap-filling.
 ✅ CORRECT: "Encountered scenario: concurrent user creation. Spec doesn't address this. Stopping to ask user: should spec cover race conditions?"
 
 ✅ CORRECT: "All spec sections implemented. Zero TODOs. Build passes. Tests pass. Behavior verified against spec. Complete."
+
+**How to Report Completion:**
+
+❌ DON'T narrate the verification:
+"Step 1: Section Coverage... ✓ Context implemented... ✓ Types implemented..."
+
+✅ DO report concisely:
+"Implementation complete. All spec sections implemented and verified."
+
+OR if gap found:
+"Spec gap found: Error handling for concurrent writes not specified in Database Schema section. Need clarification before proceeding."
 
 ## Listing Sections
 
