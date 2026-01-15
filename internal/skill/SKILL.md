@@ -38,6 +38,48 @@ Requirements: Go 1.21+, Claude Code >= 2.1, asciidoctor CLI
 | `cca list` | List all sections in spec |
 | `cca skill` | Install/update this Claude Code skill |
 
+## Core Principle: SPEC IS TRUTH
+
+**CONSTITUTIONAL RULE:** Never implement before the spec. Always adhere to the spec.
+
+This means:
+- Spec changes BEFORE code changes (never reverse)
+- Code implements what spec says (never what you think it should say)
+- Spec-code divergence is a critical failure
+
+**The Order:**
+1. Change spec files (if needed)
+2. Commit spec changes
+3. Verify spec with `cca compile`
+4. Then implement code
+
+Never reverse this order.
+
+**If you find yourself thinking:**
+- "I'll implement the code, then update spec to match"
+- "Spec is wrong, but I know what's right, I'll just implement"
+- "I'll update spec later, let me code first"
+
+**STOP.** You are violating CCA's core principle.
+
+**When Plans Involve Spec Changes:**
+
+If your work requires updating the spec:
+```bash
+# 1. Edit spec files first
+vim spec/stages/scoping.adoc
+
+# 2. Commit spec changes
+git commit -m "Update scoping stage to use CLI input"
+
+# 3. Verify spec was actually changed
+cca compile | grep [keyword]
+
+# 4. Only then write code
+```
+
+Implementing code before spec changes creates spec-code divergence.
+
 ## Spec Structure
 
 CCA specs are modular AsciiDoc files with two layers:
@@ -253,11 +295,26 @@ CCA-Spec: Core Types
 
 CONSTITUTIONAL RULE: You may NOT declare implementation complete until passing this verification.
 
-**IMPORTANT:** This is an INTERNAL checklist. Verify silently, report only:
-- "Implementation complete" (if all checks pass), OR
-- "Spec gap: [specific scenario not covered]" (if spec is incomplete)
+**IMPORTANT:** This is an INTERNAL checklist.
+
+**Use thinking blocks for verification.** Do NOT output verification steps to user.
+
+Your thinking block should contain:
+- Section mapping (spec sections → implementation commits)
+- Divergence check (spec vs implementation comparison)
+- Gap detection (scenarios not covered)
+- Completion determination
+
+Your user-facing output should ONLY be:
+- "Implementation complete. All spec sections implemented and verified." OR
+- "Spec gap found: [specific scenario]. Section [name] doesn't specify [behavior]. Need clarification." OR
+- "Spec divergence: Spec shows [X], implemented [Y] because [reason]. Spec should be updated."
 
 **Step 1: Spec Faithfulness - Section Mapping**
+
+**CRITICAL:** Verify against the ACTUAL spec content, not what you think spec should say.
+
+Run: `cca compile` and read the current spec.
 
 List every spec section with implementation status:
 
@@ -269,10 +326,25 @@ List every spec section with implementation status:
 ```
 
 If ANY section shows "NOT IMPLEMENTED":
-- Re-read that section carefully (is it actually required?)
+- Re-read that section carefully in the COMPILED spec
 - Check Scope Out (is it explicitly excluded?)
 - If required and not excluded: implement it now
-- If unclear: STOP and ask user "Does spec require X? Section Y doesn't specify it."
+- If unclear: STOP and ask user
+
+**Spec-Code Alignment Check:**
+
+Compare what spec says vs what you implemented:
+
+```
+Spec says: "TUI with Bubble Tea framework"
+Code has: "CLI with stdin/stdout"
+→ CRITICAL DIVERGENCE - code doesn't match spec AT ALL
+```
+
+If you find divergence:
+- DON'T rationalize ("but CLI is better")
+- DON'T continue ("I'll update spec later")
+- STOP and report: "Spec describes [X], implementation is [Y]. Which is correct? If [Y], update spec first."
 
 **Step 2: Spec Divergence Check**
 
