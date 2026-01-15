@@ -253,103 +253,111 @@ CCA-Spec: Core Types
 
 CONSTITUTIONAL RULE: You may NOT declare implementation complete until passing this verification.
 
-**Step 1: Section Coverage**
+**Step 1: Spec Faithfulness - Section Mapping**
 
-List every spec section and implementation status:
+List every spec section with implementation status:
 
 ```
-✓ Context - implemented in commit abc123
-✓ Core Types - implemented in commit def456
-✓ Database Schema - implemented in commit ghi789
-✗ Error Handling - NOT IMPLEMENTED
+✓ Context - N/A (informational)
+✓ Core Types - implemented in commit abc123
+✓ Database Schema - implemented in commit def456
+✗ Error States - NOT IMPLEMENTED
 ```
 
-If ANY section shows "NOT IMPLEMENTED" → you are incomplete. Continue implementing.
+If ANY section shows "NOT IMPLEMENTED":
+- Re-read that section carefully (is it actually required?)
+- Check Scope Out (is it explicitly excluded?)
+- If required and not excluded: implement it now
+- If unclear: STOP and ask user "Does spec require X? Section Y doesn't specify it."
 
-**Step 2: Gap Check**
+**Step 2: Invention Check**
 
-Answer each question:
+Answer:
 
-1. Are there any "known gaps"? [YES/NO]
-2. Are there any "deferred features"? [YES/NO]
-3. Are there any "future enhancements"? [YES/NO]
-4. Are there any "TODO" or "FIXME" comments in code? [YES/NO]
+```
+Q1: Did I implement any features NOT in the spec?
+[List any features you added that spec doesn't mention]
 
-If ANY answer is YES → you are incomplete. Fix gaps, remove TODOs.
+Q2: Did I make any architectural choices the spec doesn't specify?
+[List any decisions you made that spec leaves open]
+```
 
-**Step 3: Spec Completeness Verification**
+If Q1 or Q2 have items:
+- Check if Context (Abstract/Approach/Scope) guided the decision
+- If Context supports it: OK
+- If not in spec at all: STOP and ask user "Should I add [feature]? Spec doesn't mention it."
 
-For each spec section, verify:
-- Behavior matches spec exactly (not approximation)
-- All requirements from section implemented (not just "critical" ones)
-- No spec statements ignored or deferred
+**Step 3: Deferral Detection**
 
-**Step 4: Build + Integration Verification**
+Search your implementation for:
+- TODO or FIXME comments
+- "Known gap" or "deferred" in your thinking
+- Incomplete implementations
+
+If found: These are NOT allowed. Either:
+- Implement now (if spec requires it)
+- Remove (if spec doesn't require it)
+- STOP and ask user (if spec is unclear)
+
+**Step 4: Spec Insufficiency Check**
+
+While implementing, did you encounter scenarios where the spec was silent?
+
+```
+Scenario: [describe what spec doesn't cover]
+Resolution: [how you handled it]
+Source: [Context section that guided you, or "UNCLEAR"]
+```
+
+If any resolutions say "UNCLEAR":
+- STOP implementing
+- Report to user: "Spec doesn't specify [scenario]. Need clarification in [section]."
+- Don't guess or invent behavior
+
+**Step 5: Build + Behavior Verification**
 
 - Code compiles/builds successfully
 - Tests pass (if spec requires tests)
-- Components integrate correctly
+- Behavior matches spec EXACTLY (not "close enough")
 - No runtime errors on basic usage
-
-**Only after ALL steps pass:** You may declare implementation complete.
-
-**Anti-Pattern Examples:**
-
-❌ WRONG:
-"Parse error retry is minor feature, core flow works, marking complete"
-→ Spec requires it. Not minor. Not optional. Implement it.
-
-❌ WRONG:
-"Known gap in error handling but critical path done"
-→ If there's a known gap, you're not done. Fix the gap.
-
-❌ WRONG:
-"Deferred interactive retry to phase 2"
-→ There is no phase 2. This IS the implementation. Implement it now.
-
-✅ CORRECT:
-"Spec section Error States requires interactive retry. Not implemented yet. Implementing now before declaring complete."
-
-✅ CORRECT:
-"All spec sections mapped to commits. Zero gaps. All tests pass. Behavior verified against spec. Implementation complete."
-
-**Self-Consistency Check (Required Before Completion):**
-
-Before declaring complete, you MUST answer these questions:
-
-```
-Q1: List every spec section - is each one implemented?
-[Your answer: section-by-section mapping to commits]
-
-Q2: Are there any known gaps in the implementation?
-[Your answer: YES or NO - if YES, list them and implement now]
-
-Q3: Are there any features marked "deferred" or "future"?
-[Your answer: YES or NO - if YES, they're not deferred, implement now]
-
-Q4: Does the implementation behave EXACTLY as the spec describes?
-[Your answer: specific behavior verification, not "mostly works"]
-
-Q5: Are there any TODO or FIXME comments in the code?
-[Your answer: YES or NO - if YES, resolve them before completion]
-```
 
 **Completion Criteria:**
 
-ALL of the following must be true:
-- Q1: Every section mapped to implementation
-- Q2: NO
-- Q3: NO
-- Q4: YES (verified)
-- Q5: NO
+✅ ALL must be true:
+- Every spec section implemented (Step 1)
+- Zero invented features (Step 2)
+- Zero deferrals/TODOs (Step 3)
+- Zero unresolved spec gaps (Step 4)
+- Build + tests pass (Step 5)
 
-If this checklist fails, you are NOT complete. Continue implementing.
+❌ If ANY criterion fails: You are NOT complete.
 
-**Why This Matters:**
+**The Critical Distinction:**
 
-CCA specs are decided, not deciding. There is no "phase 2" or "future work." The spec IS the complete feature set. Anything not implemented = incomplete implementation.
+**Incomplete implementation** = You didn't implement what spec says
+→ Fix: Implement the missing spec section
 
-"Build passes" is necessary but not sufficient. "Spec complete" is the criterion.
+**Incomplete spec** = Spec doesn't say what to do for scenario X
+→ Fix: STOP, report to user, don't invent
+
+Your job is faithful implementation, not gap-filling.
+
+**Anti-Pattern Examples:**
+
+❌ WRONG: "Parse error retry not implemented - deferring to phase 2"
+→ Spec requires it. No phase 2. Implement now.
+
+❌ WRONG: "Spec doesn't say how to handle timeout - implementing exponential backoff"
+→ You just invented a feature. STOP and ask user.
+
+❌ WRONG: "Known gap in error handling but critical features done"
+→ There are no "critical vs non-critical" features in spec. All are required.
+
+✅ CORRECT: "Spec section Error States requires retry logic. Implementing now per spec."
+
+✅ CORRECT: "Encountered scenario: concurrent user creation. Spec doesn't address this. Stopping to ask user: should spec cover race conditions?"
+
+✅ CORRECT: "All spec sections implemented. Zero TODOs. Build passes. Tests pass. Behavior verified against spec. Complete."
 
 ## Listing Sections
 
