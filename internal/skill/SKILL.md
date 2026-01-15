@@ -15,6 +15,15 @@ This project uses **CCA** - a methodology and CLI for writing architecture speci
 - Context (why, scope, approach)
 - Complete implementation details (types, schemas, APIs, performance)
 
+**Installation:**
+
+If `cca` is not available:
+```bash
+go install github.com/emontenegr/ClaudeCodeArchitect/cmd/cca@latest
+```
+
+Requirements: Go 1.21+, Claude Code >= 2.1, asciidoctor CLI
+
 ## Command Reference
 
 | Command | Purpose |
@@ -303,6 +312,44 @@ For each spec section, verify:
 
 ✅ CORRECT:
 "All spec sections mapped to commits. Zero gaps. All tests pass. Behavior verified against spec. Implementation complete."
+
+**Self-Consistency Check (Required Before Completion):**
+
+Before declaring complete, you MUST answer these questions:
+
+```
+Q1: List every spec section - is each one implemented?
+[Your answer: section-by-section mapping to commits]
+
+Q2: Are there any known gaps in the implementation?
+[Your answer: YES or NO - if YES, list them and implement now]
+
+Q3: Are there any features marked "deferred" or "future"?
+[Your answer: YES or NO - if YES, they're not deferred, implement now]
+
+Q4: Does the implementation behave EXACTLY as the spec describes?
+[Your answer: specific behavior verification, not "mostly works"]
+
+Q5: Are there any TODO or FIXME comments in the code?
+[Your answer: YES or NO - if YES, resolve them before completion]
+```
+
+**Completion Criteria:**
+
+ALL of the following must be true:
+- Q1: Every section mapped to implementation
+- Q2: NO
+- Q3: NO
+- Q4: YES (verified)
+- Q5: NO
+
+If this checklist fails, you are NOT complete. Continue implementing.
+
+**Why This Matters:**
+
+CCA specs are decided, not deciding. There is no "phase 2" or "future work." The spec IS the complete feature set. Anything not implemented = incomplete implementation.
+
+"Build passes" is necessary but not sufficient. "Spec complete" is the criterion.
 
 ## Listing Sections
 
