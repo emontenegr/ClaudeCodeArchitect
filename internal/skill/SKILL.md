@@ -240,6 +240,70 @@ CCA-Spec: Core Types
 - Make one giant commit at the end
 - Omit `CCA-Spec:` trailer (needed for traceability)
 
+**7. Verification Protocol Before Declaring Complete**
+
+CONSTITUTIONAL RULE: You may NOT declare implementation complete until passing this verification.
+
+**Step 1: Section Coverage**
+
+List every spec section and implementation status:
+
+```
+✓ Context - implemented in commit abc123
+✓ Core Types - implemented in commit def456
+✓ Database Schema - implemented in commit ghi789
+✗ Error Handling - NOT IMPLEMENTED
+```
+
+If ANY section shows "NOT IMPLEMENTED" → you are incomplete. Continue implementing.
+
+**Step 2: Gap Check**
+
+Answer each question:
+
+1. Are there any "known gaps"? [YES/NO]
+2. Are there any "deferred features"? [YES/NO]
+3. Are there any "future enhancements"? [YES/NO]
+4. Are there any "TODO" or "FIXME" comments in code? [YES/NO]
+
+If ANY answer is YES → you are incomplete. Fix gaps, remove TODOs.
+
+**Step 3: Spec Completeness Verification**
+
+For each spec section, verify:
+- Behavior matches spec exactly (not approximation)
+- All requirements from section implemented (not just "critical" ones)
+- No spec statements ignored or deferred
+
+**Step 4: Build + Integration Verification**
+
+- Code compiles/builds successfully
+- Tests pass (if spec requires tests)
+- Components integrate correctly
+- No runtime errors on basic usage
+
+**Only after ALL steps pass:** You may declare implementation complete.
+
+**Anti-Pattern Examples:**
+
+❌ WRONG:
+"Parse error retry is minor feature, core flow works, marking complete"
+→ Spec requires it. Not minor. Not optional. Implement it.
+
+❌ WRONG:
+"Known gap in error handling but critical path done"
+→ If there's a known gap, you're not done. Fix the gap.
+
+❌ WRONG:
+"Deferred interactive retry to phase 2"
+→ There is no phase 2. This IS the implementation. Implement it now.
+
+✅ CORRECT:
+"Spec section Error States requires interactive retry. Not implemented yet. Implementing now before declaring complete."
+
+✅ CORRECT:
+"All spec sections mapped to commits. Zero gaps. All tests pass. Behavior verified against spec. Implementation complete."
+
 ## Listing Sections
 
 To see the spec structure:
